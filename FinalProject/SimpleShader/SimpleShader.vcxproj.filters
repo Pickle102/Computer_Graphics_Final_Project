@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="SimpleShader.cpp" />
+    <ClCompile Include="..\gl3w.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Scene\cameranode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Scene\color3.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Scene\color4.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Scene\geometrynode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Scene\presentationnode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Scene\scene.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Scene\scenenode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Scene\scenestate.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Scene\shadernode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Scene\transformnode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="line_node.h" />
+    <ClInclude Include="line_shader_node.h" />
+    <ClInclude Include="..\shader_support\glsl_fragmentshader.h">
+      <Filter>Header Files\shader_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shader_support\glsl_shader.h">
+      <Filter>Header Files\shader_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shader_support\glsl_shaderprogram.h">
+      <Filter>Header Files\shader_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shader_support\glsl_vertexshader.h">
+      <Filter>Header Files\shader_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\aabb.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\boundingsphere.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\geometry.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\hpoint2.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\hpoint3.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\matrix.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\noise.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\plane.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\point2.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\point3.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\ray3.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\segment2.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\segment3.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\vector2.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\vector3.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{bff0f534-0958-46bd-95dd-bd9821f3adbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\geometry">
+      <UniqueIdentifier>{d8486f49-5b84-44bb-b30a-22da64daed4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\scene">
+      <UniqueIdentifier>{d37cf01d-b8e5-4211-b00c-7bc31e22ffd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{3c765fca-fce6-4919-8629-135d205cc138}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\shader_support">
+      <UniqueIdentifier>{ed9ea08b-575c-44eb-af72-aca9b580e387}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="lines.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="lines.vert">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\gl3w.c" />
+    <ClCompile Include="Module3.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\geometry\aabb.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\boundingsphere.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\geometry.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\plane.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\noise.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scene\cameranode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scene\color3.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scene\color4.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scene\geometrynode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shader_support\glsl_fragmentshader.h">
+      <Filter>Header Files\shader_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shader_support\glsl_shader.h">
+      <Filter>Header Files\shader_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shader_support\glsl_shaderprogram.h">
+      <Filter>Header Files\shader_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shader_support\glsl_vertexshader.h">
+      <Filter>Header Files\shader_support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\hpoint2.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\hpoint3.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\matrix.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scene\scene.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scene\scenenode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scene\scenestate.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\vector3.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\vector2.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\segment3.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\segment2.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\ray3.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\point3.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\geometry\point2.h">
+      <Filter>Header Files\geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scene\presentationnode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scene\shadernode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\scene\transformnode.h">
+      <Filter>Header Files\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="point_node.h" />
+    <ClInclude Include="point_shader_node.h" />
+    <ClInclude Include="color_blending_node.h" />
+    <ClInclude Include="drag_line_node.h" />
+    <ClInclude Include="line_shader_node.h" />
+    <ClInclude Include="ngon_node.h" />
+    <ClInclude Include="ngon_shader_node.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="points.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="points.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="ngon.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="ngon.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaded_line.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shaded_line.frag">
+      <Filter>shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{c61e43f7-d802-446c-b560-ea66a878588f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\geometry">
+      <UniqueIdentifier>{78ca6491-c271-4421-93d2-6a95181378fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\shader_support">
+      <UniqueIdentifier>{bee5e26e-ad72-4af8-b6a7-d53bb9e6907c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\scene">
+      <UniqueIdentifier>{4427d89b-e6a0-4b2e-96bc-0426476bce7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{2dbf0ea4-7220-4171-b5a5-981148a27d5e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
