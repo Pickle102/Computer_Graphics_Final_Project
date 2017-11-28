@@ -98,151 +98,6 @@ SceneNode* SceneRoot;                     // Root of the scene graph
 CameraNode* MyCamera;                     // Camera
 LightNode* MinersLight;                   // View dependent light
 LightNode* WorldLight;                    // World coordiante light (fixed or moving)
-
-char vertex_shader[] = "#version 150\n\
-smooth out vec3 normal;\n\
-smooth out vec3 vertex;\n\
-smooth out vec2 texPos;\n\
-in vec3 vertexPosition;\n\
-in vec3 vertexNormal;\n\
-in vec2 texturePosition;\n\
-uniform mat4 pvm;\n\
-uniform mat4 modelMatrix;\n\
-uniform mat4 normalMatrix;\n\
-void main()\n\
-{\n\
-texPos = texturePosition;\n\
-normal = normalize(vec3(normalMatrix * vec4(vertexNormal, 0.0)));\n\
-vertex = vec3((modelMatrix * vec4(vertexPosition, 1.0)));\n\
-gl_Position = pvm * vec4(vertexPosition, 1.0);\n\
-}";
-
-
-char fragment_shader[] = "#version 150\n\
-out vec4 fragColor;\n\
-smooth in vec3 normal;\n\
-smooth in vec3 vertex;\n\
-smooth in vec2 texPos;\n\
-uniform vec4   materialAmbient;\n\
-uniform	vec4   materialDiffuse;\n\
-uniform	vec4   materialSpecular;\n\
-uniform	vec4   materialEmission;\n\
-uniform	float  materialShininess;\n\
-uniform int useTexture;\n\
-uniform	sampler2D texImage;\n\
-uniform vec4  globalLightAmbient;\n\
-uniform vec3  cameraPosition;\n\
-uniform int numLights;\n\
-const int MAX_LIGHTS = 3;\n\
-struct LightSource\n\
-{\n\
-  int  enabled;\n\
-  int  spotlight;\n\
-  vec4 position;\n\
-  vec4 ambient;\n\
-  vec4 diffuse;\n\
-  vec4 specular;\n\
-  float constantAttenuation;\n\
-  float linearAttenuation;\n\
-  float quadraticAttenuation;\n\
-  float spotCosCutoff; \n\
-  float spotExponent;\n\
-  vec3  spotDirection;\n\
-};\n\
-uniform LightSource lights[MAX_LIGHTS];\n\
-float calculateAttenuation(in int i, in float distance)\n\
-{\n\
-  return (1.0 / (lights[i].constantAttenuation +\n\
-    (lights[i].linearAttenuation    * distance) +\n\
-    (lights[i].quadraticAttenuation * distance * distance)));\n\
-}\n\
-void directionalLight(in int i, in vec3 N, in vec3 vtx, in vec3 V, inout vec4 ambient,\n\
-  inout vec4 diffuse, inout vec4 specular)\n\
-{\n\
-  ambient += lights[i].ambient;\n\
-  vec3 L = lights[i].position.xyz;\n\
-  float nDotL = dot(N, L);\n\
-  if (nDotL > 0.0)\n\
-  {\n\
-    diffuse += lights[i].diffuse * nDotL;\n\
-    vec3 H = normalize(L + V);\n\
-    float nDotH = dot(N, H);\n\
-    if (nDotH > 0.0)\n\
-      specular += lights[i].specular * pow(nDotH, materialShininess);\n\
-  }\n\
-}\n\
-void pointLight(in int i, in vec3 N, in vec3 vtx, in vec3 V, inout vec4 ambient,\n\
-  inout vec4 diffuse, inout vec4 specular)\n\
-{\n\
-  vec3 tmp = lights[i].position.xyz - vtx;\n\
-  float dist = length(tmp);\n\
-  vec3 L = tmp * (1.0 / dist);\n\
-  float attenuation = calculateAttenuation(i, dist);\n\
-  ambient += lights[i].ambient * attenuation;\n\
-  float nDotL = dot(N, L);\n\
-  if (nDotL > 0.0)\n\
-  {\n\
-    diffuse += lights[i].diffuse  * attenuation * nDotL;\n\
-    vec3 H = normalize(L + V);\n\
-    float nDotH = dot(N, H);\n\
-    if (nDotH > 0.0)\n\
-      specular += lights[i].specular * attenuation * pow(nDotH, materialShininess);\n\
-  }\n\
-}\n\
-void spotLight(in int i, in vec3 N, in vec3 vtx, in vec3 V, inout vec4 ambient,\n\
-  inout vec4 diffuse, inout vec4 specular)\n\
-{\n\
-  vec3 tmp = lights[i].position.xyz - vtx;\n\
-  float dist = length(tmp);\n\
-  vec3 L = tmp * (1.0 / dist);\n\
-  float attenuation = calculateAttenuation(i, dist);\n\
-  float nDotL = dot(N, L);\n\
-  if (nDotL > 0.0)\n\
-  {\n\
-    float spotEffect = dot(lights[i].spotDirection, -L);\n\
-    if (spotEffect > lights[i].spotCosCutoff)\n\
-    {\n\
-      attenuation *= pow(spotEffect, lights[i].spotExponent);\n\
-      diffuse += lights[i].diffuse  * attenuation * nDotL;\n\
-      vec3 H = normalize(L + V);\n\
-      float nDotH = dot(N, H);\n\
-      if (nDotH > 0.0)\n\
-        specular += lights[i].specular * attenuation * pow(nDotH, materialShininess);\n\
-    }\n\
-    else\n\
-      attenuation = 0.0;\n\
-  }\n\
-  ambient += lights[i].ambient * attenuation;\n\
-}\n\
-void main()\n\
-{\n\
-  vec3 n = normalize(normal);\n\
-  vec3 V = normalize(cameraPosition - vertex);\n\
-  vec4 ambient = vec4(0.0);\n\
-  vec4 diffuse = vec4(0.0);\n\
-  vec4 specular = vec4(0.0);\n\
-  for (int i = 0; i < numLights; i++)\n\
-  {\n\
-    if (lights[i].enabled != 1)\n\
-      continue;\n\
-    if (lights[i].position.w == 0.0)\n\
-      directionalLight(i, n, vertex, V, ambient, diffuse, specular);\n\
-    else if (lights[i].spotlight == 1)\n\
-      spotLight(i, n, vertex, V, ambient, diffuse, specular);\n\
-    else\n\
-      pointLight(i, n, vertex, V, ambient, diffuse, specular);\n\
-  }\n\
-  vec4 color = materialEmission + globalLightAmbient * materialAmbient +\n\
-    (ambient  * materialAmbient) + (diffuse  * materialDiffuse) + (specular * materialSpecular);\n\
-  if (useTexture == 1)\n\
-  {\n\
-    // If a texture is bound, get its texel and modulate lighting and texture color\n\
-    vec4 texel = texture2D(texImage, texPos);\n\
-    color = vec4(color.rgb * texel.rgb, color.a * texel.a);\n\
-  }\n\
-  fragColor = clamp(color, 0.0, 1.0);\n\
-}";
-
       
 // Simple logging function
 void logmsg(const char *message, ...) {
@@ -315,11 +170,14 @@ void AnimateView(int val) {
     TimerActive = false;
 }
 
+/**
+* Construct the terrain for the scene.
+*/
 SceneNode* ConstructTerrain(TexturedUnitSquareSurface* textured_square)
 {
-	// Contruct transform nodes for the walls. Perform rotations so the 
-	// walls face inwards
+	// Contruct transform for the floor
 	TransformNode* floor_transform = new TransformNode;
+	floor_transform->Translate(0.0f, 0.0f, -10.0f);
 	floor_transform->Scale(200.0f, 200.0f, 1.0f);
 
 	// Use a texture for the floor
@@ -327,6 +185,7 @@ SceneNode* ConstructTerrain(TexturedUnitSquareSurface* textured_square)
 		Color4(0.4f, 0.4f, 0.4f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 5.0f);
 	floor_material->SetTexture("floor_tiles.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
+	// Return the constructed floor
 	SceneNode* floor = new SceneNode;
 	floor->AddChild(floor_material);
 	floor_material->AddChild(floor_transform);
@@ -339,11 +198,14 @@ SceneNode* ConstructTerrain(TexturedUnitSquareSurface* textured_square)
  * Construct scene including camera, lights, geometry nodes
  */
 void ConstructScene() {
+
   // Construct the lighting shader node
   LightingShaderNode* lightingShader = new LightingShaderNode();
-  if (!lightingShader->CreateFromSource(vertex_shader, fragment_shader) ||
-      !lightingShader->GetLocations())
-    exit(-1);
+  if (!lightingShader->Create("phong.vert", "phong.frag") ||
+	  !lightingShader->GetLocations())
+  {
+	  exit(-1);
+  }
 
   int position_loc = lightingShader->GetPositionLoc();
   int normal_loc   = lightingShader->GetNormalLoc();
