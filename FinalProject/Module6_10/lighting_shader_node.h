@@ -214,7 +214,7 @@ protected:
   int light_count;            // Number of lights
   GLint lightcount_loc;       // Light count uniform locations
   GLint globalambient_loc;    // Global ambient uniform location
-  LightUniforms lights[2];    // Light source uniform locations
+  LightUniforms lights[3];    // Light source uniform locations
 };
 
 #endif

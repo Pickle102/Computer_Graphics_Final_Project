@@ -763,9 +763,6 @@ void ConstructScene() {
   // Sphere
   SceneNode* globe = ConstructGlobe(position_loc, normal_loc, texture_loc);
 
-  // Torus
-//  SceneNode* shiny_torus = ConstructShinyTorus(position_loc, normal_loc);
-
   // Painting
   SceneNode* painting = ConstructPainting(position_loc, normal_loc, texture_loc);
 
@@ -800,7 +797,6 @@ void ConstructScene() {
   // Add the vase, globe, and torus
   myscene->AddChild(vase);
   myscene->AddChild(globe);
-//  myscene->AddChild(shiny_torus);
   myscene->AddChild(painting);
 }
 
