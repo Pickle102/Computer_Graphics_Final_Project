@@ -211,6 +211,8 @@ void ConstructScene() {
   int normal_loc   = lightingShader->GetNormalLoc();
   int texture_loc  = lightingShader->GetTextureLoc();
 
+  lightingShader->EnableFog(Color4(0.5f, 0.5f, 0.5f, 1.0f));
+
   // Initialize the view and set a perspective projection
   MyCamera = new CameraNode;
   MyCamera->SetPosition(Point3(0.0f, -100.0f, 0.0f));
@@ -246,6 +248,30 @@ void ConstructScene() {
 
   SceneNode *floor = ConstructTerrain(textured_square);
 
+  /********TEST***************/
+  // To be replaced by trees!
+  ConicSurface* test_obj = new ConicSurface(0.5f, 0.5f, 18, 4,
+	  position_loc, normal_loc);
+
+
+  // Contruct transform for the floor
+  TransformNode* test_obj_transform = new TransformNode;
+  test_obj_transform->Translate(-20.0f, -10.0f, -10.0f);
+  test_obj_transform->Scale(6.0f, 6.0f, 40.0f);
+
+  // Use a texture for the floor
+  PresentationNode* test_obj_material = new PresentationNode(Color4(0.15f, 0.15f, 0.15f),
+	  Color4(0.4f, 0.4f, 0.4f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 5.0f);
+  test_obj_material->SetTexture("floor_tiles.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+
+  // Return the constructed floor
+  SceneNode* test = new SceneNode;
+  test->AddChild(test_obj_material);
+  test_obj_material->AddChild(test_obj_transform);
+  test_obj_transform->AddChild(test_obj);
+  /********TEST***************/
+
   // Construct scene graph
   SceneRoot = new SceneNode;
   SceneRoot->AddChild(lightingShader);
@@ -253,6 +279,7 @@ void ConstructScene() {
   MyCamera->AddChild(WorldLight);
   WorldLight->AddChild(MinersLight);
   MinersLight->AddChild(floor);
+  MinersLight->AddChild(test);
 }
 
 /**

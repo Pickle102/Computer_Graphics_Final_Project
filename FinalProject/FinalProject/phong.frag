@@ -7,7 +7,9 @@ out vec4 fragColor;
 // Incoming, interpolated normal ant vertex position in world coordinates
 smooth in vec3 normal;
 smooth in vec3 vertex;
-smooth in vec2 texPos;  // texture coordinate 
+smooth in vec2 texPos;  // texture coordinate
+
+in vec4 viewSpace;
 
 // Uniforms for material properties
 uniform vec4   materialAmbient;
@@ -19,6 +21,10 @@ uniform	float  materialShininess;
 // Texture uniforms
 uniform int useTexture;
 uniform	sampler2D texImage;
+
+// Fog uniforms
+uniform int useFog;
+uniform vec4 fogColor;
 
 // Global lighting environment ambient intensity
 uniform vec4  globalLightAmbient;
@@ -204,6 +210,27 @@ void main()
 		// If a texture is bound, get its texel and modulate lighting and texture color
 		vec4 texel = texture2D(texImage, texPos);
 		color = vec4(color.rgb * texel.rgb, color.a * texel.a);
-	}		
+	}
+
+	if (useFog == 1)
+	{
+		float distance = 0;
+		float fogFactor = 0;
+		float fogStart = 20;
+		float fogEnd = 80;
+
+		//range based
+		distance = length(viewSpace);
+
+		//plane based
+		//distance = abs(viewSpace.z);
+
+		// linear fog
+		fogFactor = (fogEnd - distance)/(fogEnd - fogStart);
+		fogFactor = clamp( fogFactor, 0.0, 1.0 );
+
+		color = mix(fogColor, color, fogFactor);
+	}
+
 	fragColor = clamp(color, 0.0, 1.0);
 }
