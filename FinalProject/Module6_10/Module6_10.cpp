@@ -623,9 +623,9 @@ void ConstructLighting(LightingShaderNode* lighting) {
 
   // Light1 - directional light from the ceiling
   LightNode* light1 = new LightNode(1);
-  light1->SetDiffuse(Color4(0.7f, 0.7f, 0.7f, 1.0f));
-  light1->SetSpecular(Color4(0.7f, 0.7f, 0.7f, 1.0f));
-  light1->SetPosition(HPoint3(0.0f, 0.0f, 1.0f, 0.0f));
+  light1->SetDiffuse(Color4(0.4f, 0.4f, 0.4f, 1.0f));
+  light1->SetSpecular(Color4(0.4f, 0.4f, 0.4f, 1.0f));
+  light1->SetPosition(HPoint3(1.0f, 0.0f, 0.5f, 0.0f));
   light1->Enable();
 
   // Spotlight - reddish spotlight - we will place at the camera location
@@ -640,9 +640,114 @@ void ConstructLighting(LightingShaderNode* lighting) {
   Spotlight->Enable();
 
   // Lights are children of the camera node
-  MyCamera->AddChild(light0);
-  light0->AddChild(light1);
+  MyCamera->AddChild(light1);
+  //light0->AddChild(light1);
   light1->AddChild(Spotlight);
+}
+
+/**
+* Construct ground
+* @param  unit_square  Geometry node to use
+* @param  textured_square  Texture to use
+* @return Returns a scene node that describes the ground.
+*/
+SceneNode* ConstructGround(UnitSquareSurface* unit_square,
+	TexturedUnitSquareSurface* textured_square)
+{
+	// Contruct transform nodes for the ground
+	TransformNode* ground_transform = new TransformNode;
+	ground_transform->Scale(20000.0f, 20000.0f, 1.0f);
+
+	// Use a texture for the ground
+	PresentationNode* ground_material = new PresentationNode(Color4(0.15f, 0.15f, 0.15f),
+		Color4(0.4f, 0.4f, 0.4f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 25.0f);
+	ground_material->SetTexture("grass_texture_2.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	// Walls. We can group these all under a single presentation node.
+	SceneNode* ground = new SceneNode;
+
+	// Add ground to the parent. Use convenience method to add
+	// presentation, then transform, then geometry.
+	AddSubTree(ground, ground_material, ground_transform, textured_square);
+
+	return ground;
+}
+
+/**
+* Construct Sky Box
+* @param  unit_square  Geometry node to use
+* @param  textured_square  Texture to use
+* @return Returns a scene node that describes the sky box.
+*/
+SceneNode* ConstructSkyBox(UnitSquareSurface* unit_square,
+	TexturedUnitSquareSurface* textured_square)
+{
+	// Back wall is rotated +90 degrees about x: (y -> z)
+	TransformNode* backwall_transform = new TransformNode;
+	backwall_transform->Translate(0.0f, 10000.0f, 0.0f);
+	backwall_transform->RotateX(90.0f);
+	backwall_transform->Scale(20000.0f, 20000.0f, 1.0f);
+
+	// Front wall is rotated -90 degrees about x: (z -> y)
+	TransformNode* frontwall_transform = new TransformNode;
+	frontwall_transform->Translate(0.0f, -10000.0f, 0.0f);
+	frontwall_transform->RotateX(-90.0f);
+	frontwall_transform->RotateZ(-180.0f);
+	frontwall_transform->Scale(20000.0f, 20000.0f, 1.0f);
+
+	// Left wall is rotated 90 degrees about y: (z -> x)
+	TransformNode* leftwall_transform = new TransformNode;
+	leftwall_transform->Translate(-10000.0f, 0.0f, 0.0f);
+	leftwall_transform->RotateY(90.0f);
+	leftwall_transform->RotateZ(90.0f);
+	leftwall_transform->Scale(20000.0f, 20000.0f, 1.0f);
+
+	// Right wall is rotated -90 about y: (z -> -x)
+	TransformNode* rightwall_transform = new TransformNode;
+	rightwall_transform->Translate(10000.0f, 0.0f, 0.0f);
+	rightwall_transform->RotateY(-90.0f);
+	rightwall_transform->RotateZ(-90.0f);
+	rightwall_transform->Scale(20000.0f, 20000.0f, 1.0f);
+
+	// Ceiling is rotated 180 about x so it faces inwards
+	TransformNode* ceiling_transform = new TransformNode;
+	ceiling_transform->Translate(0.0f, 0.0f, 10000.0f);
+	ceiling_transform->RotateX(180.0f);
+	ceiling_transform->RotateZ(0.0f);
+	ceiling_transform->Scale(20500.0f, 20000.0f, 1.0f);
+
+	PresentationNode* backwall_material = new PresentationNode(Color4(0.5f, 0.5f, 0.5f),
+		Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(0.3f, 0.3f, 0.3f), 0.0f);
+	backwall_material->SetTexture("skybox/back.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	PresentationNode* leftwall_material = new PresentationNode(Color4(0.5f, 0.5f, 0.5f),
+		Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(0.3f, 0.3f, 0.3f), 0.0f);
+	leftwall_material->SetTexture("skybox/left.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	PresentationNode* rightwall_material = new PresentationNode(Color4(0.5f, 0.5f, 0.5f),
+		Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(0.3f, 0.3f, 0.3f), 0.0f);
+	rightwall_material->SetTexture("skybox/right.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	PresentationNode* frontwall_material = new PresentationNode(Color4(0.5f, 0.5f, 0.5f),
+		Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(0.3f, 0.3f, 0.3f), 0.0f);
+	frontwall_material->SetTexture("skybox/front.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	PresentationNode* ceiling_material = new PresentationNode(Color4(0.5f, 0.5f, 0.5f),
+		Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(0.3f, 0.3f, 0.3f), 0.0f);
+	ceiling_material->SetTexture("skybox/ceiling.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	// Scene node for skybox.
+	SceneNode* skybox = new SceneNode;
+
+	// Add skyboxes faces. Use convenience method to add
+	// presentation, then transform, then geometry
+	AddSubTree(skybox, backwall_material, backwall_transform, textured_square);
+	AddSubTree(skybox, leftwall_material, leftwall_transform, textured_square);
+	AddSubTree(skybox, rightwall_material, rightwall_transform, textured_square);
+	AddSubTree(skybox, frontwall_material, frontwall_transform, textured_square);
+	AddSubTree(skybox, ceiling_material, ceiling_transform, textured_square);
+
+	return skybox;
 }
 
 /**
@@ -666,105 +771,29 @@ void ConstructScene() {
   MyCamera->SetPosition(Point3(0.0f, -100.0f, 20.0f));
   MyCamera->SetLookAtPt(Point3(0.0f, 0.0f, 20.0f));
   MyCamera->SetViewUp(Vector3(0.0, 0.0, 1.0));
-  MyCamera->SetPerspective(50.0, 1.0, 1.0, 300.0);
+
+  // Scene is outdoor, so set far clipping to very far
+  MyCamera->SetPerspective(50.0, 1.0, 1.0, 25000.0);
 
   // Construct scene lighting - make lighting nodes children of the camera node
   ConstructLighting(shader);
 
-  // Construct subdivided square - subdivided 10x in both x and y
-  UnitSquareSurface* unit_square = new UnitSquareSurface(2, position_loc, normal_loc);
+  // Construct subdivided square - subdivided 50x in both x and y
+  UnitSquareSurface* unit_square = new UnitSquareSurface(50, position_loc, normal_loc);
+
+  // Construct a textured square for the skybox
+  TexturedUnitSquareSurface* textured_square_skybox = new TexturedUnitSquareSurface(2, 1, position_loc,
+	  normal_loc, texture_loc);
+
+  // Construct the skybox as a child of the root node
+  SceneNode* skybox = ConstructSkyBox(unit_square, textured_square_skybox);
 
   // Construct a textured square for the floor
-  TexturedUnitSquareSurface* textured_square = new TexturedUnitSquareSurface(2, 8, position_loc,
-                 normal_loc, texture_loc);
+  TexturedUnitSquareSurface* textured_square = new TexturedUnitSquareSurface(2, 200, position_loc,
+	  normal_loc, texture_loc);
 
-  // Construct a unit cylinder surface
-  ConicSurface* cylinder = new ConicSurface(0.5f, 0.5f, 18, 4, 
-                  position_loc, normal_loc);
-
-  // Construct a unit cone
-  ConicSurface* cone = new ConicSurface(0.5f, 0.0f, 18, 4,
-                  position_loc, normal_loc);
-
-  // Construct the room as a child of the root node
-  SceneNode* room = ConstructRoom(unit_square, textured_square);
-
-  // Construct a unit box
-  SceneNode* unit_box = ConstructUnitBox(unit_square);
-
-  // Construct the table
-  SceneNode* table = ConstructTable(unit_box, cylinder);
-
-  // Wood material for table
-  PresentationNode* wood = new PresentationNode(Color4(0.275f, 0.225f, 0.075f),
-        Color4(0.55f, 0.45f, 0.15f), Color4(0.3f, 0.3f, 0.3f), 
-        Color4(0.0f, 0.0f, 0.0f), 64.0f);
-
-  // Position the table in the room
-  TransformNode* table_transform = new TransformNode;
-  table_transform->Translate(-50.0f, 50.0f, 0.0f);
-  table_transform->RotateZ(30.0f);
-
-  // Teapot
-  MeshTeapot* teapot = new MeshTeapot(4, position_loc, normal_loc);
-
-  // Silver material (for the teapot)
-  PresentationNode* silver = new PresentationNode(Color4(0.19225f, 0.19225f, 0.19225f),
-        Color4(0.50754f, 0.50754f, 0.50754f), Color4(0.508273f, 0.508273f, 0.508273f),
-        Color4(0.0f, 0.0f, 0.0f), 51.2f);
-
-  // Texture cylinder for coke can
-  TexturedConicSurface* can = new TexturedConicSurface(1.0f, 1.0f, 36, 10,
-          position_loc, normal_loc, texture_loc);
-
-  // Texture for coke can
-  PresentationNode* coke_texture = new PresentationNode(Color4(0.15f, 0.15f, 0.15f),
-    Color4(0.5f, 0.5f, 0.5f), Color4(0.5f, 0.5f, 0.5f),
-    Color4(0.0f, 0.0f, 0.0f), 50.0f);
-  coke_texture->SetTexture("cokecan.jpg", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
-            GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-
-  // Transform
-  TransformNode* coke_transform = new TransformNode;
-  coke_transform->Translate(20.0f, 05.0f, 29.0f);
-  coke_transform->Scale(2.0f, 2.0f, 7.0f);
-
-  // Teapot transform. It is tough to place this - if you make too small then
-  // if you look from above the table intersects the bottom, but if you move
-  // higher when you look from outside it looks like the teapot is above the
-  // table. This is because we don't know the exact dimensions of the teapot.
-  TransformNode* teapot_transform = new TransformNode;
-  teapot_transform->Translate(0.0f, 0.0f, 26.0f);
-  teapot_transform->Scale(2.5f, 2.5f, 2.5f);
-
-  // Add a box position transform (used as base transform for the box and
-  // the cone on top of the box
-  TransformNode* box_position_transform = new TransformNode();
-  box_position_transform->Translate(80.0f, 80.0f, 7.5f);
-
-  // Add a material and transform for box in the back right corner
-  PresentationNode* box_material = new PresentationNode(Color4(0.25f, 0.125f, 0.125f),
-    Color4(0.5f, 0.25f, 0.25f), Color4(0.25f, 0.25f, 0.25f), Color4(0.0f, 0.0f, 0.0f), 32.0f);
-  TransformNode* box_transform = new TransformNode();
-  box_transform->RotateZ(45.0f);
-  box_transform->Scale(20.0f, 20.0f, 15.0f);
-
-  // Position a golden cone on top of the box
-  PresentationNode* cone_material = new PresentationNode(Color4(0.25f, 0.2f, 0.05f),
-    Color4(0.75164f, 0.60648f, 0.22648f), Color4(0.75f, 0.75f, 0.75f), 
-    Color4(0.0f, 0.0f, 0.0f), 96.0f);
-  TransformNode* cone_transform = new TransformNode();
-  cone_transform->Translate(0.0f, 0.0f, 15.0f);
-  cone_transform->Scale(8.0f, 8.0f, 15.0f);
-
-  // Construct a vase
-  SceneNode* vase = ConstructVase(position_loc, normal_loc);
-
-  // Sphere
-  SceneNode* globe = ConstructGlobe(position_loc, normal_loc, texture_loc);
-
-  // Painting
-  SceneNode* painting = ConstructPainting(position_loc, normal_loc, texture_loc);
+  // Construct the ground as a child of the root node
+  SceneNode* ground = ConstructGround(unit_square, textured_square);
 
   // Construct the scene layout
   SceneRoot = new SceneNode;
@@ -777,27 +806,9 @@ void ConstructScene() {
   SceneNode* myscene = new SceneNode;
   Spotlight->AddChild(myscene);
 
-  // Add the room (walls, floor, ceiling)
-  myscene->AddChild(room);
-
-  // Add the table
-  myscene->AddChild(wood);
-  wood->AddChild(table_transform);
-  table_transform->AddChild(table);
-
-  // Add teapot and coke can as children of the table transform.
-  AddSubTree(table_transform, silver, teapot_transform, teapot);
-  AddSubTree(table_transform, coke_texture, coke_transform, can);
-
-  // Add box in the back right corner with the cone on top
-  myscene->AddChild(box_position_transform);
-  AddSubTree(box_position_transform, box_material, box_transform, unit_box);
-  AddSubTree(box_position_transform, cone_material, cone_transform, cone);
-
-  // Add the vase, globe, and torus
-  myscene->AddChild(vase);
-  myscene->AddChild(globe);
-  myscene->AddChild(painting);
+  // Add the ground
+  myscene->AddChild(skybox);
+  myscene->AddChild(ground);
 }
 
 /**
@@ -824,7 +835,7 @@ int main(int argc, char** argv) {
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH | GLUT_MULTISAMPLE);
   glutInitWindowPosition(100, 100); 
   glutInitWindowSize(800, 600);
-  glutCreateWindow("Simple 3-D Scene by David Nesbitt");
+  glutCreateWindow("Final Project - J. Griffith, J. Olk");
  
   // Add GLUT callbacks
   glutDisplayFunc(display);
