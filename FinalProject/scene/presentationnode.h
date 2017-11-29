@@ -34,11 +34,11 @@ public:
 
   /**
    * Constructor given material properties.
-   * @param  ma  Material ambient reflection coefficients (color).
-   * @param  md  Material diffuse reflection coefficients (color).
-   * @param  ms  Material specular reflection coefficients (color).
-   * @param  me  Material emission (color).
-   * @param  s   Material shininess.
+   * @param  ma      Material ambient reflection coefficients (color).
+   * @param  md      Material diffuse reflection coefficients (color).
+   * @param  ms      Material specular reflection coefficients (color).
+   * @param  me      Material emission (color).
+   * @param  s       Material shininess.
    */
   PresentationNode(const Color4& ma, const Color4& md, const Color4& ms,
                    const Color4& me, const float s)

@@ -13,7 +13,10 @@ in vec2 texturePosition;     // Texture coordinate
 // Uniforms for matrices
 uniform mat4 pvm;					// Composite projection, view, model matrix
 uniform mat4 modelMatrix;			// Modeling  matrix
+uniform mat4 viewMatrix;            // View matrix
 uniform mat4 normalMatrix;			// Normal transformation matrix
+
+out vec4 viewSpace;
 
 // Simple shader for Phong (per-pixel) shading. The fragment shader will
 // do all the work. We need to pass per-vertex normals to the fragment
@@ -30,4 +33,7 @@ void main()
 
 	// Convert position to clip coordinates and pass along
 	gl_Position = pvm * vec4(vertexPosition, 1.0);
+
+	// Send to fragment shader
+	viewSpace = viewMatrix * modelMatrix * vec4(vertexPosition,1);
 }

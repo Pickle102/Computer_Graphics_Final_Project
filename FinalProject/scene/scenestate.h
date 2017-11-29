@@ -48,6 +48,7 @@ struct SceneState {
   GLint color_loc;          // Constant color
   GLint pvm_loc;            // Composite project, view, model matrix location
   GLint modelmatrix_loc;    // Model matrix location
+  GLint viewmatrix_loc;     // View matrix location
   GLint normalmatrix_loc;   // Normal matrix location
   GLint cameraposition_loc; // Camera position loc
 
@@ -61,6 +62,10 @@ struct SceneState {
   // Texture mapping
   GLint usetexture_loc;
   GLint textureunit_loc;
+
+  // Fog uniform locations
+  GLint usefog_loc;
+  GLint fogcolor_loc;
 
   // Lights
   int    max_enabled_light;    // Index of the maximum enabled light index

@@ -86,6 +86,7 @@ public:
     // Populate matrix uniform locations in scene state
     pvm_loc = glGetUniformLocation(shader_program.GetProgram(), "pvm");
     modelmatrix_loc = glGetUniformLocation(shader_program.GetProgram(), "modelMatrix");
+	viewmatrix_loc = glGetUniformLocation(shader_program.GetProgram(), "viewMatrix");
     normalmatrix_loc = glGetUniformLocation(shader_program.GetProgram(), "normalMatrix");
   
     // Populate material uniform locations in scene state 
@@ -98,6 +99,10 @@ public:
     // Populate texture locations
     usetexture_loc = glGetUniformLocation(shader_program.GetProgram(), "useTexture");
     textureunit_loc = glGetUniformLocation(shader_program.GetProgram(), "texImage");
+
+	// Populate fog locations
+	usefog_loc = glGetUniformLocation(shader_program.GetProgram(), "useFog");
+	fogcolor_loc = glGetUniformLocation(shader_program.GetProgram(), "fogColor");
 
     // Populate camera position uniform location in scene state
     cameraposition_loc = glGetUniformLocation(shader_program.GetProgram(), "cameraPosition");
@@ -120,6 +125,7 @@ public:
     scene_state.cameraposition_loc = cameraposition_loc;
     scene_state.pvm_loc = pvm_loc;
     scene_state.modelmatrix_loc = modelmatrix_loc;
+	scene_state.viewmatrix_loc = viewmatrix_loc;
     scene_state.normalmatrix_loc = normalmatrix_loc;
     scene_state.materialambient_loc = materialambient_loc;
     scene_state.materialdiffuse_loc = materialdiffuse_loc;
@@ -128,6 +134,8 @@ public:
     scene_state.materialshininess_loc = materialshininess_loc;
     scene_state.usetexture_loc = usetexture_loc;
     scene_state.textureunit_loc = textureunit_loc;
+	scene_state.usefog_loc = usefog_loc;
+	scene_state.fogcolor_loc = fogcolor_loc;
 
     // Set the light locations
     for (int i = 0; i < light_count; i++) {
@@ -161,6 +169,18 @@ public:
   }
 
   /**
+  * Enable fog with the given fog color.
+  *   Fog will not be enabled unless this is called.
+  * @param  fogColor  The color of the fog
+  */
+  void EnableFog(const Color4& fogColor)
+  {
+	  shader_program.Use();
+	  glUniform1i(usefog_loc, 1);
+	  glUniform4fv(fogcolor_loc, 1, &fogColor.r);
+  }
+
+  /**
   * Get the location of the vertex position attribute.
   * @return  Returns the vertex position attribute location.
   */
@@ -191,6 +211,7 @@ protected:
    GLint texture_loc;
    GLint pvm_loc;
    GLint modelmatrix_loc;
+   GLint viewmatrix_loc;
    GLint normalmatrix_loc;
    GLint materialambient_loc;
    GLint materialdiffuse_loc;
@@ -201,6 +222,8 @@ protected:
    GLint globalambient_loc;
    GLint usetexture_loc;
    GLint textureunit_loc;
+   GLint usefog_loc;
+   GLint fogcolor_loc;
 
    int light_count;
    GLint lightcount_loc;
