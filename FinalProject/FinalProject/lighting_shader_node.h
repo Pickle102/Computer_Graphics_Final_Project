@@ -85,6 +85,7 @@ public:
       
     // Populate matrix uniform locations in scene state
     pvm_loc = glGetUniformLocation(shader_program.GetProgram(), "pvm");
+	projectmatrix_loc = glGetUniformLocation(shader_program.GetProgram(), "projectionMatrix");
     modelmatrix_loc = glGetUniformLocation(shader_program.GetProgram(), "modelMatrix");
 	viewmatrix_loc = glGetUniformLocation(shader_program.GetProgram(), "viewMatrix");
     normalmatrix_loc = glGetUniformLocation(shader_program.GetProgram(), "normalMatrix");
@@ -103,6 +104,11 @@ public:
 	// Populate fog locations
 	usefog_loc = glGetUniformLocation(shader_program.GetProgram(), "useFog");
 	fogcolor_loc = glGetUniformLocation(shader_program.GetProgram(), "fogColor");
+
+	// Billboard uniform locations
+	enablebillboard_loc = glGetUniformLocation(shader_program.GetProgram(), "enableBillboard");
+	cameraup_loc = glGetUniformLocation(shader_program.GetProgram(), "cameraUp");
+	cameraright_loc = glGetUniformLocation(shader_program.GetProgram(), "cameraRight");
 
     // Populate camera position uniform location in scene state
     cameraposition_loc = glGetUniformLocation(shader_program.GetProgram(), "cameraPosition");
@@ -124,6 +130,7 @@ public:
     scene_state.normal_loc = normal_loc;
     scene_state.cameraposition_loc = cameraposition_loc;
     scene_state.pvm_loc = pvm_loc;
+	scene_state.projectmatrix_loc = projectmatrix_loc;
     scene_state.modelmatrix_loc = modelmatrix_loc;
 	scene_state.viewmatrix_loc = viewmatrix_loc;
     scene_state.normalmatrix_loc = normalmatrix_loc;
@@ -136,6 +143,9 @@ public:
     scene_state.textureunit_loc = textureunit_loc;
 	scene_state.usefog_loc = usefog_loc;
 	scene_state.fogcolor_loc = fogcolor_loc;
+	scene_state.enablebillboard_loc = enablebillboard_loc;
+	scene_state.cameraup_loc = cameraup_loc;
+	scene_state.cameraright_loc = cameraright_loc;
 
     // Set the light locations
     for (int i = 0; i < light_count; i++) {
@@ -210,6 +220,7 @@ protected:
    GLint normal_loc;
    GLint texture_loc;
    GLint pvm_loc;
+   GLint projectmatrix_loc;
    GLint modelmatrix_loc;
    GLint viewmatrix_loc;
    GLint normalmatrix_loc;
@@ -224,6 +235,9 @@ protected:
    GLint textureunit_loc;
    GLint usefog_loc;
    GLint fogcolor_loc;
+   GLint enablebillboard_loc;
+   GLint cameraup_loc;
+   GLint cameraright_loc;
 
    int light_count;
    GLint lightcount_loc;

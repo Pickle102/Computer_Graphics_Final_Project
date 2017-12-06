@@ -173,7 +173,7 @@ void AnimateView(int val) {
 /**
 * Construct the terrain for the scene.
 */
-SceneNode* ConstructTerrain(TexturedUnitSquareSurface* textured_square)
+SceneNode* ConstructTerrain(TexturedUnitSquareSurface* floor_square, TexturedUnitSquareSurface* tree_square)
 {
 	// Contruct transform for the floor
 	TransformNode* floor_transform = new TransformNode;
@@ -185,13 +185,39 @@ SceneNode* ConstructTerrain(TexturedUnitSquareSurface* textured_square)
 		Color4(0.4f, 0.4f, 0.4f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 5.0f);
 	floor_material->SetTexture("floor_tiles.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
-	// Return the constructed floor
-	SceneNode* floor = new SceneNode;
-	floor->AddChild(floor_material);
-	floor_material->AddChild(floor_transform);
-	floor_transform->AddChild(textured_square);
+	PresentationNode* tree_material = new PresentationNode(
+		Color4(0.5f, 0.5f, 0.5f), Color4(0.75f, 0.75f, 0.75f),
+		Color4(0.1f, 0.1f, 0.1f), Color4(0.0f, 0.0f, 0.0f), 5.0f);
+	tree_material->SetTexture("tree5.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
+		GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	tree_material->CreateBillboard();
 
-	return floor;
+	TransformNode* tree1_transform = new TransformNode;
+		tree1_transform->Translate(0.0f, -10.0f, 0.0f);
+		tree1_transform->RotateX(90.0f);
+		tree1_transform->Scale(15.0f, 25.0f, 1.0f);
+
+    TransformNode* tree2_transform = new TransformNode;
+		tree2_transform->Translate(0.0f, -10.0f, 0.0f);
+		tree2_transform->RotateX(90.0f);
+		tree2_transform->RotateY(90.0f);
+		tree2_transform->Scale(15.0f, 25.0f, 1.0f);
+
+	// Return the constructed floor
+	SceneNode* terrain = new SceneNode;
+	terrain->AddChild(floor_material);
+	floor_material->AddChild(floor_transform);
+	floor_transform->AddChild(floor_square);
+
+	terrain->AddChild(tree_material);
+	tree_material->AddChild(tree1_transform);
+	tree1_transform->AddChild(tree_square);
+
+	terrain->AddChild(tree_material);
+	tree_material->AddChild(tree2_transform);
+	tree2_transform->AddChild(tree_square);
+
+	return terrain;
 }
 
 /**
@@ -243,10 +269,13 @@ void ConstructScene() {
   MinersLight->SetSpotlight(dir, 64.0f, 45.0f);
   MinersLight->Disable();
 
-  TexturedUnitSquareSurface* textured_square = new TexturedUnitSquareSurface(2, 8, position_loc,
+  TexturedUnitSquareSurface* floor_square = new TexturedUnitSquareSurface(2, 8, position_loc,
 	  normal_loc, texture_loc);
 
-  SceneNode *floor = ConstructTerrain(textured_square);
+  TexturedUnitSquareSurface* tree_square = new TexturedUnitSquareSurface(1, 1, position_loc,
+	  normal_loc, texture_loc);
+
+  SceneNode *terrain = ConstructTerrain(floor_square, tree_square);
 
   /********TEST***************/
   // To be replaced by trees!
@@ -278,7 +307,7 @@ void ConstructScene() {
   lightingShader->AddChild(MyCamera);
   MyCamera->AddChild(WorldLight);
   WorldLight->AddChild(MinersLight);
-  MinersLight->AddChild(floor);
+  MinersLight->AddChild(terrain);
   MinersLight->AddChild(test);
 }
 
@@ -304,6 +333,34 @@ void keyboard(unsigned char key, int x, int y) {
    switch (key) {
     // Escape key - exit program
     case 27:   exit(0);   break;
+
+	// Slide right
+	case 'd':
+		MyCamera->Slide(5.0f, 0.0f, 0.0f);
+		UpdateSpotlight();
+		glutPostRedisplay();
+		break;
+
+	// Slide left
+	case 'a':
+		MyCamera->Slide(-5.0f, 0.0f, 0.0f);
+		UpdateSpotlight();
+		glutPostRedisplay();
+		break;
+
+	// Move forward
+	case 'w':
+		MyCamera->Slide(0.0f, 0.0f, -5.0f);
+		UpdateSpotlight();
+		glutPostRedisplay();
+		break;
+
+	// Move backward
+	case 's':
+		MyCamera->Slide(0.0f, 0.0f, 5.0f);
+		UpdateSpotlight();
+		glutPostRedisplay();
+		break;
 
     // Roll the camera by 5 degrees (no need to update spotlight)
     case 'r':  MyCamera->Roll(5);  break;
@@ -341,36 +398,6 @@ void keyboard(unsigned char key, int x, int y) {
       MyCamera->SetLookAtPt(Point3(0.0f, 0.0f, 0.0f));
       MyCamera->SetViewUp(Vector3(0.0, 0.0, 1.0));
       UpdateSpotlight();
-      break;
-
-    // Change to fixed world light
-    case 'w':
-      CurrentLight = FIXED_WORLD;
-      WorldLight->Enable();
-      WorldLightPosition = { 50.0f, -50.0f, 50.f, 1.0f };
-      WorldLight->SetPosition(WorldLightPosition);
-      MinersLight->Disable();
-      break;
-
-    // Moving light
-    case 'm':
-      CurrentLight = MOVING_LIGHT;
-      LightRotation = 0;
-      WorldLight->Enable();
-      WorldLightPosition = { 50.0f, -50.0f, 50.f, 1.0f };
-      WorldLight->SetPosition(WorldLightPosition);
-      MinersLight->Disable();
-
-      // Want to start the light moving
-      if (!TimerActive)
-         glutTimerFunc(10, AnimateView, 0);
-      break;
-
-    // Light at view direction
-    case 'v':
-      CurrentLight = MINERS_LIGHT;
-      MinersLight->Enable();
-      WorldLight->Disable();
       break;
 
     case 'b':
@@ -453,8 +480,8 @@ void reshape(int width, int height) {
 int main(int argc, char** argv) {
   // Print options
   std::cout << "Transforms:" << std::endl;
-  std::cout << "x,X - rotate object about x axis" << std::endl;
-  std::cout << "z,Z - rotate object about z axis" << std::endl;
+  std::cout << "d - Slide camera right            a - Slide camera left" << std::endl;
+  std::cout << "w - Move camera forward           s - Move camera backwards" << std::endl;
   std::cout << "r,R - Change camera roll" << std::endl;
   std::cout << "p,P - Change camera pitch" << std::endl;
   std::cout << "h,H - Change camera heading" << std::endl;
@@ -501,12 +528,18 @@ int main(int argc, char** argv) {
   glEnable(GL_DEPTH_TEST);
 
   // Enable back face polygon removal
-  glFrontFace(GL_CCW);
-  glCullFace(GL_BACK);
-  glEnable(GL_CULL_FACE);
+  //glFrontFace(GL_CCW);
+  //glCullFace(GL_BACK);
+  //glEnable(GL_CULL_FACE);
 
   // Enable multisample anti-aliasing
   glEnable(GL_MULTISAMPLE);
+
+  // Using blending for tree transparency
+  //(GL_BLEND);
+  //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  //glBlendFunc(GL_ONE, GL_ONE);
 
   // Construct the scene.
   ConstructScene();

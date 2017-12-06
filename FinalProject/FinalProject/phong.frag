@@ -173,6 +173,7 @@ void spotLight(in int i, in vec3 N, in vec3 vtx, in vec3 V, inout vec4 ambient,
 // Main fragment shader. 
 void main()
 {
+
 	// Normalize the normal - as a linear interpolation of normals can result
 	// in non unit-length vectors. Cannot directly modify the varying value, so
 	// create a temporary variable here. 
@@ -211,6 +212,13 @@ void main()
 		vec4 texel = texture2D(texImage, texPos);
 		color = vec4(color.rgb * texel.rgb, color.a * texel.a);
 	}
+
+	// Transparency (for the trees)
+	if (color.a == 0)
+    {
+        discard;
+    }
+
 
 	if (useFog == 1)
 	{

@@ -12,9 +12,15 @@ in vec2 texturePosition;     // Texture coordinate
 
 // Uniforms for matrices
 uniform mat4 pvm;					// Composite projection, view, model matrix
+uniform mat4 projectionMatrix;	    // Projection  matrix
 uniform mat4 modelMatrix;			// Modeling  matrix
 uniform mat4 viewMatrix;            // View matrix
 uniform mat4 normalMatrix;			// Normal transformation matrix
+
+// Enable this texture to be a cylindrical billboard (like a tree)
+uniform int enableBillboard;
+uniform vec3 cameraUp;
+uniform vec3 cameraRight;
 
 out vec4 viewSpace;
 
@@ -31,9 +37,25 @@ void main()
 	normal = normalize(vec3(normalMatrix * vec4(vertexNormal, 0.0)));
 	vertex = vec3((modelMatrix * vec4(vertexPosition, 1.0)));
 
+	vec3 vertexPos;
+	mat4 modelViewMatrix = viewMatrix * modelMatrix;
+	if (enableBillboard == 1)
+	{
+		vertexPos.x = vertexPosition.x - ((cameraRight.x * normal.x) + (cameraUp.x * normal.y));
+		vertexPos.y = vertexPosition.y - ((cameraRight.y * normal.x) + (cameraUp.y * normal.y));
+		vertexPos.z = vertexPosition.z - ((cameraRight.z * normal.x) + (cameraUp.z * normal.y));
+
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(vertexPos, 1.0);
+	}
+	else
+	{
+		//vertexPos = vec4(vertexPosition, 1.0);
+		gl_Position = pvm * vec4(vertexPosition, 1.0);
+	}
+
 	// Convert position to clip coordinates and pass along
-	gl_Position = pvm * vec4(vertexPosition, 1.0);
+	//gl_Position = pvm * vec4(vertexPosition, 1.0);
 
 	// Send to fragment shader
-	viewSpace = viewMatrix * modelMatrix * vec4(vertexPosition,1);
+	viewSpace = viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
 }
