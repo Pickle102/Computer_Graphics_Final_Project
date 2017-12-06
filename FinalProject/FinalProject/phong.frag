@@ -216,7 +216,7 @@ void main()
 	{
 		float distance = 0;
 		float fogFactor = 0;
-		float fogStart = 20;
+		float fogStart = 50;
 		float fogEnd = 80;
 
 		//range based
@@ -229,7 +229,7 @@ void main()
 		fogFactor = (fogEnd - distance)/(fogEnd - fogStart);
 		fogFactor = clamp( fogFactor, 0.0, 1.0 );
 
-		color = mix(fogColor, color, fogFactor);
+		color = mix(fogColor, color, fogFactor + 0.2);
 	}
 
 	fragColor = clamp(color, 0.0, 1.0);

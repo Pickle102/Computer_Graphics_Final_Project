@@ -265,7 +265,7 @@ SceneNode* ConstructGround(UnitSquareSurface* unit_square,
 	ground_transform->Scale(20000.0f, 20000.0f, 1.0f);
 
 	// Use a texture for the ground
-	PresentationNode* ground_material = new PresentationNode(Color4(0.15f, 0.15f, 0.15f),
+	PresentationNode* ground_material = new PresentationNode(Color4(0.45f, 0.45f, 0.45f),
 		Color4(0.4f, 0.4f, 0.4f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 25.0f);
 	ground_material->SetTexture("grass_texture_2.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
