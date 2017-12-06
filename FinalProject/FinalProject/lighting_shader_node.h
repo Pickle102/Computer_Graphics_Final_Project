@@ -241,7 +241,7 @@ protected:
 
    int light_count;
    GLint lightcount_loc;
-   LightUniforms lights[3];
+   LightUniforms lights[10];
 };
 
 #endif
