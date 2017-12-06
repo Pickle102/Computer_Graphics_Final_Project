@@ -47,6 +47,7 @@ struct SceneState {
   GLint orthomatrix_loc;    // Orthographic projection location (2-D)
   GLint color_loc;          // Constant color
   GLint pvm_loc;            // Composite project, view, model matrix location
+  GLint projectmatrix_loc;  // Composite projection matrix location
   GLint modelmatrix_loc;    // Model matrix location
   GLint viewmatrix_loc;     // View matrix location
   GLint normalmatrix_loc;   // Normal matrix location
@@ -66,6 +67,11 @@ struct SceneState {
   // Fog uniform locations
   GLint usefog_loc;
   GLint fogcolor_loc;
+
+  // Billboard uniform locations
+  GLint enablebillboard_loc;
+  GLint cameraup_loc;
+  GLint cameraright_loc;
 
   // Lights
   int    max_enabled_light;    // Index of the maximum enabled light index

@@ -28,6 +28,7 @@ public:
     reference_count = 0;
     material_shininess = 1.0f;
     texture_id = 0;             // Default to no texture
+	isBillboard = false;
 
     // Note: color constructors default rgb to 0 and alpha to 1
   }
@@ -107,11 +108,13 @@ public:
    * @param  fname  Texture image filename
    * @param  wrap_s  OpenGL wrap option (s)
    * @param  wrap_t  OpenGL wrap option (t)
-   * @param  min_filter  OpenGL filter to use for minification
-   * @param  mag_filter  OpenGL filter to use for magnification
+   * @param  min_filter   OpenGL filter to use for minification
+   * @param  mag_filter   OpenGL filter to use for magnification
+   * @param  isBillboard  True if this texture is a billboard, false otherwise.
    */
   void SetTexture(const std::string& fname, GLuint wrap_s, GLuint wrap_t,
-                  GLuint min_filter, GLuint mag_filter) {
+                  GLuint min_filter, GLuint mag_filter) 
+  {
     // Bind a DevIL image
     ILuint id;
     ilGenImages(1, &id);
@@ -176,6 +179,11 @@ public:
     glBindTexture(GL_TEXTURE_2D, 0);
   }
 
+  void CreateBillboard()
+  {
+	  this->isBillboard = true;
+  }
+
   /**
    * Update texture filtering for this material
    * @param  min_filter  OpenGL filter to use for minification
@@ -200,6 +208,12 @@ public:
     glUniform4fv(scene_state.materialspecular_loc, 1, &material_specular.r);
     glUniform4fv(scene_state.materialemission_loc, 1, &material_emission.r);
     glUniform1f(scene_state.materialshininess_loc, material_shininess);
+
+	// Enable billboarding
+	if (this->isBillboard)
+	{
+		glUniform1f(scene_state.enablebillboard_loc, 1);
+	}
 
     // Enable texture mapping and bind the texture
     if (texture_id) {
@@ -231,6 +245,7 @@ protected:
   Color4  material_emission;
   GLfloat material_shininess;
   GLuint  texture_id;
+  bool    isBillboard;
 };
 
 #endif

@@ -52,11 +52,18 @@ public:
     // Set the shader PVM matrix - this will allow drawing children without a TransformNode
     glUniformMatrix4fv(scene_state.pvm_loc, 1, GL_FALSE, scene_state.pv.Get());
 
+	// Set the projection matrix
+	glUniformMatrix4fv(scene_state.projectmatrix_loc, 1, GL_FALSE, projection.Get());
+
 	// Set the view matrix
 	glUniformMatrix4fv(scene_state.viewmatrix_loc, 1, GL_FALSE, view.Get());
 
     // Set the camera position
     glUniform3fv(scene_state.cameraposition_loc, 1, &vrp.x);
+
+	// Set the rest of the camera values
+	glUniform3fv(scene_state.cameraup_loc, 1, &v.x);
+	glUniform3fv(scene_state.cameraright_loc, 1, &u.x);
  
     // Draw children
     SceneNode::Draw(scene_state);
