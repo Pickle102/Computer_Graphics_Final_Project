@@ -98,6 +98,7 @@ SceneNode* SceneRoot;                     // Root of the scene graph
 CameraNode* MyCamera;                     // Camera
 LightNode* MinersLight;                   // View dependent light
 LightNode* WorldLight;                    // World coordiante light (fixed or moving)
+LightNode* Spotlight;					  // Keep the spotlight global so we can update its poisition
       
 // Simple logging function
 void logmsg(const char *message, ...) {
@@ -114,13 +115,27 @@ void logmsg(const char *message, ...) {
    va_end(arg);
 }
 
-// Update spotlight given camera position and orientation
+/**
+* Convenience method to add a material, then a transform, then a
+* geometry node as a child to a specified parent node.
+* @param  parent    Parent scene node.
+* @param  material  Presentation node.
+* @param  transform Transformation node.
+* @param  geometry  Geometry node.
+*/
+void AddSubTree(SceneNode* parent, SceneNode* material,
+	SceneNode* transform, SceneNode* geometry) {
+	parent->AddChild(material);
+	material->AddChild(transform);
+	transform->AddChild(geometry);
+}
+
+// Update the spotlight based on camera position change
 void UpdateSpotlight() {
-  // Update spotlight/miners light
-   Point3 pos = MyCamera->GetPosition();
-   MinersLight->SetPosition(HPoint3(pos.x, pos.y, pos.z, 1.0f));
-   Vector3 dir = MyCamera->GetViewPlaneNormal() * -1.0f;
-   MinersLight->SetSpotlight(dir, 64.0f, 45.0f);
+	Point3 pos = MyCamera->GetPosition();
+	Spotlight->SetPosition(HPoint3(pos.x, pos.y, pos.z, 1.0f));
+	Vector3 dir = MyCamera->GetViewPlaneNormal() * -1.0f;
+	Spotlight->SetSpotlightDirection(dir);
 }
 
 /**
@@ -195,6 +210,153 @@ SceneNode* ConstructTerrain(TexturedUnitSquareSurface* textured_square)
 }
 
 /**
+* Construct lighting for this scene.
+* @param  lighting  Pointer to the lighting shader node.
+*/
+void ConstructLighting(LightingShaderNode* lighting) {
+	// Set the global light ambient
+	Color4 globalAmbient(0.4f, 0.4f, 0.4f, 1.0f);
+	lighting->SetGlobalAmbient(globalAmbient);
+
+	lighting->EnableFog(Color4(0.25f, 0.25f, 0.25f, 1.0f));
+
+	// Light 0 - point light source in back right corner
+	LightNode* light0 = new LightNode(0);
+	light0->SetDiffuse(Color4(0.5f, 0.5f, 0.5f, 1.0f));
+	light0->SetSpecular(Color4(0.5f, 0.5f, 0.5f, 1.0f));
+	light0->SetPosition(HPoint3(90.0f, 90.0f, 30.f, 1.0f));
+	light0->Enable();
+
+	// Light1 - directional light from the ceiling
+	LightNode* light1 = new LightNode(1);
+	light1->SetDiffuse(Color4(0.4f, 0.4f, 0.4f, 1.0f));
+	light1->SetSpecular(Color4(0.4f, 0.4f, 0.4f, 1.0f));
+	light1->SetPosition(HPoint3(1.0f, 0.0f, 0.5f, 0.0f));
+	light1->Enable();
+
+	// Spotlight - reddish spotlight - we will place at the camera location
+	// shining along -VPN
+	Spotlight = new LightNode(2);
+	Spotlight->SetDiffuse(Color4(0.5f, 0.1f, 0.1f, 1.0f));
+	Spotlight->SetSpecular(Color4(0.5f, 0.1f, 0.1f, 1.0f));
+	Point3 pos = MyCamera->GetPosition();
+	Spotlight->SetPosition(HPoint3(pos.x, pos.y, pos.z, 1.0f));
+	Vector3 dir = MyCamera->GetViewPlaneNormal() * -1.0f;
+	Spotlight->SetSpotlight(dir, 32.0f, 30.0f);
+	Spotlight->Enable();
+
+	// Lights are children of the camera node
+	MyCamera->AddChild(light1);
+	//light0->AddChild(light1);
+	light1->AddChild(Spotlight);
+}
+
+/**
+* Construct ground
+* @param  unit_square  Geometry node to use
+* @param  textured_square  Texture to use
+* @return Returns a scene node that describes the ground.
+*/
+SceneNode* ConstructGround(UnitSquareSurface* unit_square,
+	TexturedUnitSquareSurface* textured_square)
+{
+	// Contruct transform nodes for the ground
+	TransformNode* ground_transform = new TransformNode;
+	ground_transform->Scale(20000.0f, 20000.0f, 1.0f);
+
+	// Use a texture for the ground
+	PresentationNode* ground_material = new PresentationNode(Color4(0.15f, 0.15f, 0.15f),
+		Color4(0.4f, 0.4f, 0.4f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 25.0f);
+	ground_material->SetTexture("grass_texture_2.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	// Walls. We can group these all under a single presentation node.
+	SceneNode* ground = new SceneNode;
+
+	// Add ground to the parent. Use convenience method to add
+	// presentation, then transform, then geometry.
+	AddSubTree(ground, ground_material, ground_transform, textured_square);
+
+	return ground;
+}
+
+/**
+* Construct Sky Box
+* @param  unit_square  Geometry node to use
+* @param  textured_square  Texture to use
+* @return Returns a scene node that describes the sky box.
+*/
+SceneNode* ConstructSkyBox(UnitSquareSurface* unit_square,
+	TexturedUnitSquareSurface* textured_square)
+{
+	// Back wall is rotated +90 degrees about x: (y -> z)
+	TransformNode* backwall_transform = new TransformNode;
+	backwall_transform->Translate(0.0f, 10000.0f, 0.0f);
+	backwall_transform->RotateX(90.0f);
+	backwall_transform->Scale(20000.0f, 20000.0f, 1.0f);
+
+	// Front wall is rotated -90 degrees about x: (z -> y)
+	TransformNode* frontwall_transform = new TransformNode;
+	frontwall_transform->Translate(0.0f, -10000.0f, 0.0f);
+	frontwall_transform->RotateX(-90.0f);
+	frontwall_transform->RotateZ(-180.0f);
+	frontwall_transform->Scale(20000.0f, 20000.0f, 1.0f);
+
+	// Left wall is rotated 90 degrees about y: (z -> x)
+	TransformNode* leftwall_transform = new TransformNode;
+	leftwall_transform->Translate(-10000.0f, 0.0f, 0.0f);
+	leftwall_transform->RotateY(90.0f);
+	leftwall_transform->RotateZ(90.0f);
+	leftwall_transform->Scale(20000.0f, 20000.0f, 1.0f);
+
+	// Right wall is rotated -90 about y: (z -> -x)
+	TransformNode* rightwall_transform = new TransformNode;
+	rightwall_transform->Translate(10000.0f, 0.0f, 0.0f);
+	rightwall_transform->RotateY(-90.0f);
+	rightwall_transform->RotateZ(-90.0f);
+	rightwall_transform->Scale(20000.0f, 20000.0f, 1.0f);
+
+	// Ceiling is rotated 180 about x so it faces inwards
+	TransformNode* ceiling_transform = new TransformNode;
+	ceiling_transform->Translate(0.0f, 0.0f, 10000.0f);
+	ceiling_transform->RotateX(180.0f);
+	ceiling_transform->RotateZ(0.0f);
+	ceiling_transform->Scale(20500.0f, 20000.0f, 1.0f);
+
+	PresentationNode* backwall_material = new PresentationNode(Color4(0.5f, 0.5f, 0.5f),
+		Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(0.3f, 0.3f, 0.3f), 0.0f);
+	backwall_material->SetTexture("skybox/back.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	PresentationNode* leftwall_material = new PresentationNode(Color4(0.5f, 0.5f, 0.5f),
+		Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(0.3f, 0.3f, 0.3f), 0.0f);
+	leftwall_material->SetTexture("skybox/left.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	PresentationNode* rightwall_material = new PresentationNode(Color4(0.5f, 0.5f, 0.5f),
+		Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(0.3f, 0.3f, 0.3f), 0.0f);
+	rightwall_material->SetTexture("skybox/right.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	PresentationNode* frontwall_material = new PresentationNode(Color4(0.5f, 0.5f, 0.5f),
+		Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(0.3f, 0.3f, 0.3f), 0.0f);
+	frontwall_material->SetTexture("skybox/front.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	PresentationNode* ceiling_material = new PresentationNode(Color4(0.5f, 0.5f, 0.5f),
+		Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(0.3f, 0.3f, 0.3f), 0.0f);
+	ceiling_material->SetTexture("skybox/ceiling.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	// Scene node for skybox.
+	SceneNode* skybox = new SceneNode;
+
+	// Add skyboxes faces. Use convenience method to add
+	// presentation, then transform, then geometry
+	AddSubTree(skybox, backwall_material, backwall_transform, textured_square);
+	AddSubTree(skybox, leftwall_material, leftwall_transform, textured_square);
+	AddSubTree(skybox, rightwall_material, rightwall_transform, textured_square);
+	AddSubTree(skybox, frontwall_material, frontwall_transform, textured_square);
+	AddSubTree(skybox, ceiling_material, ceiling_transform, textured_square);
+
+	return skybox;
+}
+
+/**
  * Construct scene including camera, lights, geometry nodes
  */
 void ConstructScene() {
@@ -211,75 +373,58 @@ void ConstructScene() {
   int normal_loc   = lightingShader->GetNormalLoc();
   int texture_loc  = lightingShader->GetTextureLoc();
 
-  lightingShader->EnableFog(Color4(0.5f, 0.5f, 0.5f, 1.0f));
-
   // Initialize the view and set a perspective projection
   MyCamera = new CameraNode;
   MyCamera->SetPosition(Point3(0.0f, -100.0f, 0.0f));
   MyCamera->SetLookAtPt(Point3(0.0f, 0.0f, 0.0f));
   MyCamera->SetViewUp(Vector3(0.0, 0.0, 1.0));
-  MyCamera->SetPerspective(50.0, 1.0, 1.0, 300.0);
+
+  // Scene is outdoor, so set far clipping to very far
+  MyCamera->SetPerspective(50.0, 1.0, 1.0, 25000.0);
 
   // Set world light default position and a light rotation matrix
   WorldLightPosition = { 50.0f, -50.0f, 50.f, 1.0f };
   LightTransform.Rotate(2.0f, 0.0f, 0.0f, 1.0f);
 
-  // Set a white light - use for fixed and moving light
-  // Positional light at 45 degree angle to the upper right 
-  // front corner
-  WorldLight = new LightNode(0);
-  WorldLight->SetDiffuse(Color4(1.0f, 1.0f, 1.0f, 1.0f ));
-  WorldLight->SetSpecular(Color4(1.0f, 1.0f, 1.0f, 1.0f ));
-  WorldLight->SetPosition(WorldLightPosition);
-  WorldLight->Enable();
-
-  // Light 1 - Miner's light - use a yellow spotlight
-  MinersLight = new LightNode(1);
-  MinersLight->SetDiffuse(Color4(1.0f, 1.0f, 0.0f, 1.0f));
-  MinersLight->SetSpecular(Color4(1.0f, 1.0f, 0.0f, 1.0f));
-  Point3 pos = MyCamera->GetPosition();
-  MinersLight->SetPosition(HPoint3(pos.x, pos.y, pos.z, 1.0f));
-  Vector3 dir = MyCamera->GetViewPlaneNormal() * -1.0f;
-  MinersLight->SetSpotlight(dir, 64.0f, 45.0f);
-  MinersLight->Disable();
-
-  TexturedUnitSquareSurface* textured_square = new TexturedUnitSquareSurface(2, 8, position_loc,
-	  normal_loc, texture_loc);
-
-  SceneNode *floor = ConstructTerrain(textured_square);
-
   /********TEST***************/
   // To be replaced by trees!
   ConicSurface* test_obj = new ConicSurface(0.5f, 0.5f, 18, 4,
-	  position_loc, normal_loc);
+	  position_loc, normal_loc);;
 
+  // Construct scene lighting - make lighting nodes children of the camera node
+  ConstructLighting(lightingShader);
 
-  // Contruct transform for the floor
-  TransformNode* test_obj_transform = new TransformNode;
-  test_obj_transform->Translate(-20.0f, -10.0f, -10.0f);
-  test_obj_transform->Scale(6.0f, 6.0f, 40.0f);
+  // Construct subdivided square - subdivided 50x in both x and y
+  UnitSquareSurface* unit_square = new UnitSquareSurface(50, position_loc, normal_loc);
 
-  // Use a texture for the floor
-  PresentationNode* test_obj_material = new PresentationNode(Color4(0.15f, 0.15f, 0.15f),
-	  Color4(0.4f, 0.4f, 0.4f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 5.0f);
-  test_obj_material->SetTexture("floor_tiles.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+  // Construct a textured square for the skybox
+  TexturedUnitSquareSurface* textured_square_skybox = new TexturedUnitSquareSurface(2, 1, position_loc,
+	  normal_loc, texture_loc);
 
+  // Construct the skybox as a child of the root node
+  SceneNode* skybox = ConstructSkyBox(unit_square, textured_square_skybox);
 
-  // Return the constructed floor
-  SceneNode* test = new SceneNode;
-  test->AddChild(test_obj_material);
-  test_obj_material->AddChild(test_obj_transform);
-  test_obj_transform->AddChild(test_obj);
-  /********TEST***************/
+  // Construct a textured square for the floor
+  TexturedUnitSquareSurface* textured_square = new TexturedUnitSquareSurface(2, 200, position_loc,
+	  normal_loc, texture_loc);
 
-  // Construct scene graph
+  // Construct the ground as a child of the root node
+  SceneNode* ground = ConstructGround(unit_square, textured_square);
+
+  // Construct the scene layout
   SceneRoot = new SceneNode;
   SceneRoot->AddChild(lightingShader);
   lightingShader->AddChild(MyCamera);
-  MyCamera->AddChild(WorldLight);
-  WorldLight->AddChild(MinersLight);
-  MinersLight->AddChild(floor);
-  MinersLight->AddChild(test);
+
+  // Construct a base node for the rest of the scene, it will be a child
+  // of the last light node (so entire scene is under influence of all 
+  // lights)
+  SceneNode* myscene = new SceneNode;
+  Spotlight->AddChild(myscene);
+
+  // Add the ground
+  myscene->AddChild(skybox);
+  myscene->AddChild(ground);
 }
 
 /**
