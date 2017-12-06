@@ -220,11 +220,11 @@ void ConstructLighting(LightingShaderNode* lighting) {
 
 	lighting->EnableFog(Color4(0.25f, 0.25f, 0.25f, 1.0f));
 
-	// Light 0 - point light source in back right corner
+	// Light 0 - point light source for fire
 	LightNode* light0 = new LightNode(0);
-	light0->SetDiffuse(Color4(0.5f, 0.5f, 0.5f, 1.0f));
-	light0->SetSpecular(Color4(0.5f, 0.5f, 0.5f, 1.0f));
-	light0->SetPosition(HPoint3(90.0f, 90.0f, 30.f, 1.0f));
+	light0->SetDiffuse(Color4(5.0f, 5.0f, 0.0f, 1.0f));
+	light0->SetSpecular(Color4(0.4f, 0.4f, 0.0f, 1.0f));
+	light0->SetPosition(HPoint3(0.0f, 0.0f, 3.5f, 1.0f));
 	light0->Enable();
 
 	// Light1 - directional light from the ceiling
@@ -246,8 +246,8 @@ void ConstructLighting(LightingShaderNode* lighting) {
 	Spotlight->Enable();
 
 	// Lights are children of the camera node
-	MyCamera->AddChild(light1);
-	//light0->AddChild(light1);
+	MyCamera->AddChild(light0);
+	light0->AddChild(light1);
 	light1->AddChild(Spotlight);
 }
 
@@ -277,6 +277,165 @@ SceneNode* ConstructGround(UnitSquareSurface* unit_square,
 	AddSubTree(ground, ground_material, ground_transform, textured_square);
 
 	return ground;
+}
+
+
+/**
+* Construct firewood
+* @param  unit_square  Geometry node to use for wood
+* @return Returns a scene node representing the firewood
+*/
+SceneNode* ConstructFirewood(SceneNode* box) {
+	// Table legs (relative to center of table)
+	TransformNode* piece1 = new TransformNode;
+	piece1->Translate(2.5f, 0.0f, 0.0f);
+	piece1->RotateY(45.0f);
+	piece1->Scale(5.0f, 2.0f, 2.0f);
+	TransformNode* piece2 = new TransformNode;
+	piece2->Translate(-2.5f, 0.0f, 0.0f);
+	piece2->RotateY(-45.0f);
+	piece2->Scale(5.0f, 2.0f, 2.0f);
+	TransformNode* piece3 = new TransformNode;
+	piece3->Translate(0.0f, 2.5f, 0.0f);
+	piece3->RotateZ(90.0f);
+	piece3->RotateY(45.0f);
+	piece3->Scale(5.0f, 2.0f, 2.0f);
+	TransformNode* piece4 = new TransformNode;
+	piece4->Translate(0.0f, -2.5f, 0.0f);
+	piece4->RotateZ(-90.0f);
+	piece4->RotateY(45.0f);
+	piece4->Scale(5.0f, 2.0f, 2.0f);
+
+	PresentationNode* firewood_material = new PresentationNode(Color4(0.45f, 0.45f, 0.45f),
+		Color4(0.4f, 0.4f, 0.4f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 25.0f);
+	firewood_material->SetTexture("firewood.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	// Create the tree
+	SceneNode* table = new SceneNode;
+	table->AddChild(firewood_material);
+	firewood_material->AddChild(piece1);
+	firewood_material->AddChild(piece2);
+	firewood_material->AddChild(piece3);
+	firewood_material->AddChild(piece4);
+	piece1->AddChild(box);
+	piece2->AddChild(box);
+	piece3->AddChild(box);
+	piece4->AddChild(box);
+
+
+	return table;
+}
+
+/**
+* Construct a unit tent with outward facing normals.
+* @param  textured_square  Geometry node to use
+*/
+SceneNode* ConstructUnitTent(TexturedUnitTriangleSurface* textured_triangle, TexturedUnitSquareSurface* textured_square) {
+	// Contruct transform nodes for the sides of the box.
+	// Perform rotations so the sides face outwards
+
+	// Bottom is rotated 180 degrees so it faces outwards
+	TransformNode* bottom_transform = new TransformNode;
+	bottom_transform->Translate(0.0f, 0.0f, -0.5f);
+	bottom_transform->RotateX(180.0f);
+
+	// Back is rotated -90 degrees about x: (z -> y)
+	TransformNode* back_transform = new TransformNode;
+	back_transform->Translate(0.0f, 0.5f, 0.0f);
+	back_transform->RotateX(-90.0f);
+	back_transform->RotateZ(180.0f);
+
+	// Front wall is rotated 90 degrees about x: (y -> z)
+	TransformNode* front_transform = new TransformNode;
+	front_transform->Translate(0.0f, -0.5f, 0.0f);
+	front_transform->RotateX(90.0f);
+
+	// Left wall is rotated -90 about y: (z -> -x)
+	TransformNode* left_transform = new TransformNode;
+	left_transform->Translate(-0.25f, 0.0f, 00.0f);
+	left_transform->RotateY(-63.5f);
+	left_transform->Scale(1.1f, 1.0f, 1.0f);
+
+	// Right wall is rotated 90 degrees about y: (z -> x)
+	TransformNode* right_transform = new TransformNode;
+	right_transform->Translate(0.25f, 0.0f, 0.0f);
+	right_transform->RotateY(63.5f);
+	right_transform->Scale(1.1f, 1.0f, 1.0f);
+
+	PresentationNode* tent_material = new PresentationNode(Color4(0.45f, 0.45f, 0.45f),
+		Color4(0.4f, 0.4f, 0.4f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 25.0f);
+	tent_material->SetTexture("tent.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	// Create a SceneNode and add the 6 sides of the box.
+	SceneNode* tent = new SceneNode;
+	tent->AddChild(tent_material);
+	tent_material->AddChild(back_transform);
+	back_transform->AddChild(textured_triangle);
+	tent_material->AddChild(left_transform);
+	left_transform->AddChild(textured_square);
+	tent_material->AddChild(right_transform);
+	right_transform->AddChild(textured_square);
+	tent_material->AddChild(front_transform);
+	front_transform->AddChild(textured_triangle);
+	tent_material->AddChild(bottom_transform);
+	bottom_transform->AddChild(textured_square);
+
+	return tent;
+}
+
+/**
+* Construct a unit box with outward facing normals.
+* @param  textured_square  Geometry node to use
+*/
+SceneNode* ConstructTexturedUnitBox(TexturedUnitSquareSurface* textured_square) {
+	// Contruct transform nodes for the sides of the box.
+	// Perform rotations so the sides face outwards
+
+	// Bottom is rotated 180 degrees so it faces outwards
+	TransformNode* bottom_transform = new TransformNode;
+	bottom_transform->Translate(0.0f, 0.0f, -0.5f);
+	bottom_transform->RotateX(180.0f);
+
+	// Back is rotated -90 degrees about x: (z -> y)
+	TransformNode* back_transform = new TransformNode;
+	back_transform->Translate(0.0f, 0.5f, 0.0f);
+	back_transform->RotateX(-90.0f);
+
+	// Front wall is rotated 90 degrees about x: (y -> z)
+	TransformNode* front_transform = new TransformNode;
+	front_transform->Translate(0.0f, -0.5f, 0.0f);
+	front_transform->RotateX(90.0f);
+
+	// Left wall is rotated -90 about y: (z -> -x)
+	TransformNode* left_transform = new TransformNode;
+	left_transform->Translate(-0.5f, 0.0f, 00.0f);
+	left_transform->RotateY(-90.0f);
+
+	// Right wall is rotated 90 degrees about y: (z -> x)
+	TransformNode* right_transform = new TransformNode;
+	right_transform->Translate(0.5f, 0.0f, 0.0f);
+	right_transform->RotateY(90.0f);
+
+	// Top 
+	TransformNode* top_transform = new TransformNode;
+	top_transform->Translate(0.0f, 0.0f, 0.50f);
+
+	// Create a SceneNode and add the 6 sides of the box.
+	SceneNode* box = new SceneNode;
+	box->AddChild(back_transform);
+	back_transform->AddChild(textured_square);
+	box->AddChild(left_transform);
+	left_transform->AddChild(textured_square);
+	box->AddChild(right_transform);
+	right_transform->AddChild(textured_square);
+	box->AddChild(front_transform);
+	front_transform->AddChild(textured_square);
+	box->AddChild(bottom_transform);
+	bottom_transform->AddChild(textured_square);
+	box->AddChild(top_transform);
+	top_transform->AddChild(textured_square);
+
+	return box;
 }
 
 /**
@@ -375,7 +534,7 @@ void ConstructScene() {
 
   // Initialize the view and set a perspective projection
   MyCamera = new CameraNode;
-  MyCamera->SetPosition(Point3(0.0f, -100.0f, 0.0f));
+  MyCamera->SetPosition(Point3(0.0f, -60.0f, 10.0f));
   MyCamera->SetLookAtPt(Point3(0.0f, 0.0f, 0.0f));
   MyCamera->SetViewUp(Vector3(0.0, 0.0, 1.0));
 
@@ -397,6 +556,10 @@ void ConstructScene() {
   // Construct subdivided square - subdivided 50x in both x and y
   UnitSquareSurface* unit_square = new UnitSquareSurface(50, position_loc, normal_loc);
 
+  // Construct a textured triangle for general use
+  TexturedUnitTriangleSurface* textured_generic_triangle = new TexturedUnitTriangleSurface(1, 1, position_loc,
+	  normal_loc, texture_loc);
+
   // Construct a textured square for the skybox
   TexturedUnitSquareSurface* textured_square_skybox = new TexturedUnitSquareSurface(2, 1, position_loc,
 	  normal_loc, texture_loc);
@@ -408,8 +571,27 @@ void ConstructScene() {
   TexturedUnitSquareSurface* textured_square = new TexturedUnitSquareSurface(2, 200, position_loc,
 	  normal_loc, texture_loc);
 
+  // Construct a textured square for general use
+  TexturedUnitSquareSurface* textured_generic_square = new TexturedUnitSquareSurface(2, 1, position_loc,
+	  normal_loc, texture_loc);
+
   // Construct the ground as a child of the root node
   SceneNode* ground = ConstructGround(unit_square, textured_square);
+
+  // Construct firewood
+  TransformNode* firewood_transform = new TransformNode;
+  firewood_transform->Translate(0.0f, 0.0f, 1.2f);
+  firewood_transform->Scale(0.5f, 0.5f, 0.5f);
+
+  SceneNode* firewood = ConstructFirewood(ConstructTexturedUnitBox(textured_generic_square));
+
+  // Construct tent
+  TransformNode* tent_transform = new TransformNode;
+  tent_transform->Translate(25.0f, 25.0f, 6.5f);
+  tent_transform->RotateZ(-45.0f);
+  tent_transform->Scale(20.0f, 20.0f, 20.0f);
+
+  SceneNode* tent = ConstructUnitTent(textured_generic_triangle, textured_generic_square);
 
   // Construct the scene layout
   SceneRoot = new SceneNode;
@@ -422,9 +604,17 @@ void ConstructScene() {
   SceneNode* myscene = new SceneNode;
   Spotlight->AddChild(myscene);
 
-  // Add the ground
+  // Add the ground & skybox
   myscene->AddChild(skybox);
   myscene->AddChild(ground);
+
+  // Add the firewood
+  myscene->AddChild(firewood_transform);
+  firewood_transform->AddChild(firewood);
+
+  // Add the tent
+  myscene->AddChild(tent_transform);
+  tent_transform->AddChild(tent);
 }
 
 /**
