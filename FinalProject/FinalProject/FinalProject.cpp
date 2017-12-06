@@ -201,16 +201,10 @@ SceneNode* ConstructTreeModel(float x, float y, TexturedUnitSquareSurface* tree_
         GL_NEAREST, GL_NEAREST);
     tree_material->CreateBillboard();
 
-    TransformNode* treeFront_transform = new TransformNode;
+    TransformNode* treeFront_transform = new TransformNode();
     treeFront_transform->Translate(x, y, 6.0f);
     treeFront_transform->RotateX(90.0f);
     treeFront_transform->Scale(15.0f, 15.0f, 1.0f);
-
-    //TransformNode* treeRighttransform = new TransformNode;
-    //treeRighttransform->Translate(x, y, 6.0f);
-    //treeRighttransform->RotateX(90.0f);
-    //treeRighttransform->RotateY(90.0f);
-    //treeRighttransform->Scale(15.0f, 15.0f, 1.0f);
 
     // Return the constructed floor
     SceneNode* tree = new SceneNode;
@@ -218,10 +212,6 @@ SceneNode* ConstructTreeModel(float x, float y, TexturedUnitSquareSurface* tree_
     tree->AddChild(tree_material);
     tree_material->AddChild(treeFront_transform);
     treeFront_transform->AddChild(tree_square);
-
-    //tree->AddChild(tree_material);
-    //tree_material->AddChild(treeRighttransform);
-    //treeRighttransform->AddChild(tree_square);
 
     return tree;
 }
@@ -560,11 +550,6 @@ void ConstructScene() {
   WorldLightPosition = { 50.0f, -50.0f, 50.f, 1.0f };
   LightTransform.Rotate(2.0f, 0.0f, 0.0f, 1.0f);
 
-  /********TEST***************/
-  // To be replaced by trees!
-  ConicSurface* test_obj = new ConicSurface(0.5f, 0.5f, 18, 4,
-	  position_loc, normal_loc);;
-
   // Construct scene lighting - make lighting nodes children of the camera node
   ConstructLighting(lightingShader);
 
@@ -597,6 +582,23 @@ void ConstructScene() {
   // Construct the ground as a child of the root node
   SceneNode* ground = ConstructGround(textured_square);
 
+  // Construct the trees
+  const int NUM_TREES = 25;
+  const int MAX_Y = 200;
+  const int MIN_Y = -200;
+  const int MAX_X = 200;
+  const int MIN_X = -200;
+  int randomX;
+  int randomY;
+  SceneNode* trees = new SceneNode;
+  for (int treeNum = 0; treeNum < NUM_TREES; ++treeNum)
+  {
+      randomX = rand() % (MAX_X - MIN_X + 1) + MIN_X;
+      randomY = rand() % (MAX_Y - MIN_Y + 1) + MIN_Y;
+
+      trees->AddChild(ConstructTreeModel(randomX, randomY, tree_textured_square));
+  }
+
   // Construct firewood
   TransformNode* firewood_transform = new TransformNode;
   firewood_transform->Translate(0.0f, 0.0f, 1.2f);
@@ -611,9 +613,7 @@ void ConstructScene() {
   tent_transform->Scale(20.0f, 20.0f, 20.0f);
 
   SceneNode* tent = ConstructUnitTent(textured_generic_triangle, textured_generic_square);
-
-  // Construct the trees
-  SceneNode* trees = ConstructTreeModel(0.0f, 30.0f, tree_textured_square);
+ 
   // Construct the scene layout
   SceneRoot = new SceneNode;
   SceneRoot->AddChild(lightingShader);
