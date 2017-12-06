@@ -206,11 +206,11 @@ SceneNode* ConstructTreeModel(float x, float y, TexturedUnitSquareSurface* tree_
     treeFront_transform->RotateX(90.0f);
     treeFront_transform->Scale(15.0f, 15.0f, 1.0f);
 
-    TransformNode* treeRighttransform = new TransformNode;
-    treeRighttransform->Translate(x, y, 6.0f);
-    treeRighttransform->RotateX(90.0f);
-    treeRighttransform->RotateY(90.0f);
-    treeRighttransform->Scale(15.0f, 15.0f, 1.0f);
+    //TransformNode* treeRighttransform = new TransformNode;
+    //treeRighttransform->Translate(x, y, 6.0f);
+    //treeRighttransform->RotateX(90.0f);
+    //treeRighttransform->RotateY(90.0f);
+    //treeRighttransform->Scale(15.0f, 15.0f, 1.0f);
 
     // Return the constructed floor
     SceneNode* tree = new SceneNode;
@@ -219,9 +219,9 @@ SceneNode* ConstructTreeModel(float x, float y, TexturedUnitSquareSurface* tree_
     tree_material->AddChild(treeFront_transform);
     treeFront_transform->AddChild(tree_square);
 
-    tree->AddChild(tree_material);
-    tree_material->AddChild(treeRighttransform);
-    treeRighttransform->AddChild(tree_square);
+    //tree->AddChild(tree_material);
+    //tree_material->AddChild(treeRighttransform);
+    //treeRighttransform->AddChild(tree_square);
 
     return tree;
 }
@@ -856,10 +856,10 @@ int main(int argc, char** argv) {
   // Enable the depth buffer
   glEnable(GL_DEPTH_TEST);
 
-    // Enable back face polygon removal
-    //glFrontFace(GL_CCW);
-    //glCullFace(GL_BACK);
-    //glEnable(GL_CULL_FACE);
+  // Enable back face polygon removal
+  glFrontFace(GL_CCW);
+  glCullFace(GL_BACK);
+  glEnable(GL_CULL_FACE);
 
   // Enable multisample anti-aliasing
   glEnable(GL_MULTISAMPLE);

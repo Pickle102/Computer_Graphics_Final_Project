@@ -48,7 +48,8 @@ public:
       material_specular(ms),
       material_emission(me),
       material_shininess(s),
-      texture_id(0) {
+      texture_id(0),
+      isBillboard(false) {
     node_type = SCENE_PRESENTATION;
     reference_count = 0;
   }
@@ -212,7 +213,7 @@ public:
 	// Enable billboarding
 	if (this->isBillboard)
 	{
-		glUniform1f(scene_state.enablebillboard_loc, 1);
+        glUniform1i(scene_state.enablebillboard_loc, 1);
 	}
 
     // Enable texture mapping and bind the texture
@@ -229,6 +230,12 @@ public:
 
     // Draw children of this node
     SceneNode::Draw(scene_state);
+
+    // Enable billboarding
+    if (this->isBillboard)
+    {
+        glUniform1i(scene_state.enablebillboard_loc, 0);
+    }
 
     // Turn off texture mapping for any nodes not descended from this presentation node
     if (texture_id) {
