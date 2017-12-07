@@ -255,7 +255,7 @@ void ConstructLighting(LightingShaderNode* lighting) {
 	LightNode* light1 = new LightNode(1);
 	light1->SetDiffuse(Color4(0.4f, 0.4f, 0.4f, 1.0f));
 	light1->SetSpecular(Color4(0.4f, 0.4f, 0.4f, 1.0f));
-	light1->SetPosition(HPoint3(1.0f, 0.0f, 0.5f, 0.0f));
+	light1->SetPosition(HPoint3(0.0f, 1.0f, 0.5f, 0.0f));
 	light1->Enable();
 
 	// Spotlight - reddish spotlight - we will place at the camera location
@@ -376,9 +376,9 @@ SceneNode* ConstructUnitTent(TexturedUnitTriangleSurface* textured_triangle, Tex
 	right_transform->RotateY(63.5f);
 	right_transform->Scale(1.1f, 1.0f, 1.0f);
 
-	PresentationNode* tent_material = new PresentationNode(Color4(0.45f, 0.45f, 0.45f),
-		Color4(0.4f, 0.4f, 0.4f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 25.0f);
-	tent_material->SetTexture("tent.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	PresentationNode* tent_material = new PresentationNode(Color4(0.25f, 0.25f, 0.25f),
+		Color4(0.2f, 0.2f, 0.2f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 50.0f);
+	tent_material->SetTexture("redtent.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
 	// Create a SceneNode and add the tent faces
 	SceneNode* tent = new SceneNode;
@@ -658,7 +658,7 @@ void ConstructScene() {
   // Construct tent
   TransformNode* tent_transform = new TransformNode;
   tent_transform->Translate(25.0f, 25.0f, 5.0f);
-  tent_transform->RotateZ(-45.0f);
+  tent_transform->RotateZ(-80.0f);
   tent_transform->Scale(15.0f, 15.0f, 10.0f);
 
   SceneNode* tent = ConstructUnitTent(textured_generic_triangle, textured_generic_square);
@@ -674,8 +674,13 @@ void ConstructScene() {
   SceneNode* myscene = new SceneNode;
   Spotlight->AddChild(myscene);
 
+  // Changing where the moon is oriented
+  TransformNode* skybox_transform = new TransformNode();
+  skybox_transform->RotateZ(90.0f);
+  skybox_transform->AddChild(skybox);
+
   // Add the terrain
-  myscene->AddChild(skybox);
+  myscene->AddChild(skybox_transform);
   myscene->AddChild(ground);
   myscene->AddChild(trees);
 
