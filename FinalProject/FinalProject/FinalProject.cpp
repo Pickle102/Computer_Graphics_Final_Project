@@ -436,19 +436,24 @@ SceneNode* ConstructUnitTent(TexturedUnitTriangleSurface* textured_triangle, Tex
 		Color4(0.2f, 0.2f, 0.2f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 50.0f);
 	tent_material->SetTexture("redtent.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
+	PresentationNode* tent_front_material = new PresentationNode(Color4(0.25f, 0.25f, 0.25f),
+		Color4(0.2f, 0.2f, 0.2f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 50.0f);
+	tent_front_material->SetTexture("triangle_tent_front.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
 	// Create a SceneNode and add the tent faces
 	SceneNode* tent = new SceneNode;
 	tent->AddChild(tent_material);
+	tent->AddChild(tent_front_material);
 	tent_material->AddChild(back_transform);
 	back_transform->AddChild(textured_triangle);
 	tent_material->AddChild(left_transform);
 	left_transform->AddChild(textured_square);
 	tent_material->AddChild(right_transform);
 	right_transform->AddChild(textured_square);
-	tent_material->AddChild(front_transform);
-	front_transform->AddChild(textured_triangle);
 	tent_material->AddChild(bottom_transform);
 	bottom_transform->AddChild(textured_square);
+	tent_front_material->AddChild(front_transform);
+	front_transform->AddChild(textured_triangle);
 
 	return tent;
 }
