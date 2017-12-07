@@ -60,10 +60,6 @@ public:
 
     // Set the camera position
     glUniform3fv(scene_state.cameraposition_loc, 1, &vrp.x);
-
-	// Set the rest of the camera values
-	glUniform3fv(scene_state.cameraup_loc, 1, &v.x);
-	glUniform3fv(scene_state.cameraright_loc, 1, &u.x);
  
     // Draw children
     SceneNode::Draw(scene_state);

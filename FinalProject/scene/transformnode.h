@@ -27,6 +27,8 @@ public:
     node_type = SCENE_TRANSFORM;
     reference_count = 0;
     LoadIdentity();
+    scaleX = 1;
+    scaleY = 1;
   }
 
   /**
@@ -39,6 +41,8 @@ public:
    */
   void LoadIdentity() {
     model_matrix.SetIdentity();
+    scaleX = 1;
+    scaleY = 1;
   }
 
   /**
@@ -92,6 +96,8 @@ public:
    */
   void Scale(const float x, const float y, const float z) {
     model_matrix.Scale(x, y, z);
+    scaleX *= x;
+    scaleY *= y;
   }
 
 	/**
@@ -117,6 +123,10 @@ public:
     Matrix4x4 pvm = scene_state.pv * scene_state.model_matrix;
     glUniformMatrix4fv(scene_state.pvm_loc, 1, GL_FALSE, pvm.Get());
 
+    // Set scale uniforms
+    glUniform1f(scene_state.scaley_loc, scaleX);
+    glUniform1f(scene_state.scalex_loc, scaleX);
+
     // Draw all children
     SceneNode::Draw(scene_state);
 
@@ -126,6 +136,10 @@ public:
 
 protected:
   Matrix4x4 model_matrix;   // Local modeling transformation
+
+  // Current scale, for billboard fix in the shader
+  float scaleX;
+  float scaleY;
 };
 
 #endif

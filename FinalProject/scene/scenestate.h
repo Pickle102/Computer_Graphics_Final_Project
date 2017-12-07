@@ -70,8 +70,8 @@ struct SceneState {
 
   // Billboard uniform locations
   GLint enablebillboard_loc;
-  GLint cameraup_loc;
-  GLint cameraright_loc;
+  GLint scalex_loc;
+  GLint scaley_loc;
 
   // Lights
   int    max_enabled_light;    // Index of the maximum enabled light index

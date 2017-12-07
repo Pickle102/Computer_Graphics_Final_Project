@@ -19,8 +19,8 @@ uniform mat4 normalMatrix;			// Normal transformation matrix
 
 // Enable this texture to be a cylindrical billboard (like a tree)
 uniform int enableBillboard;
-uniform vec3 cameraUp;
-uniform vec3 cameraRight;
+uniform float scaleX;
+uniform float scaleY;
 
 out vec4 viewSpace;
 
@@ -38,19 +38,25 @@ void main()
 	vertex = vec3((modelMatrix * vec4(vertexPosition, 1.0)));
 
 	mat4 modelViewMatrix = viewMatrix * modelMatrix;
+
+	// If this is a billboard, rotate the x and z axis toward the camera
+	// Scale is used since this method needs to seperate scale from rotation
 	if (enableBillboard == 1)
 	{
-		//modelViewMatrix[0][0] = 1.0;
+	    // X-axis
+		modelViewMatrix[0][0] = scaleX;
 		modelViewMatrix[0][1] = 0.0;
 		modelViewMatrix[0][2] = 0.0;
 
+		// Keeping the Z-axis the same (referenced as Y-axis online)
 		//modelViewMatrix[1][0] = 0.0;
-		//modelViewMatrix[1][1] = 1.0;
+		//modelViewMatrix[1][1] = scaleZ.0;
 		//modelViewMatrix[1][2] = 0.0;
-
+		
+		// Y-axis (referenced as Z-axis online)
 		modelViewMatrix[2][0] = 0.0;
 		modelViewMatrix[2][1] = 0.0;
-		//modelViewMatrix[2][2] = 1.0;
+		modelViewMatrix[2][2] = scaleY;
 	}
 
 	// Convert position to clip coordinates and pass along
