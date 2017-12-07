@@ -103,14 +103,20 @@ public:
 	// Currently, only allows for 3 vertex triangle
 	vtx.vertex.x = -0.5f;
 	vtx.vertex.y = -0.5f;
+	vtx.t = 0.0f;
+	vtx.s = 0.0f;
 	vertices.push_back(vtx);
 
 	vtx.vertex.x = 0.5f;
 	vtx.vertex.y = -0.5f;
+	vtx.t = 1.0f;
+	vtx.s = 0.0f;
 	vertices.push_back(vtx);
 
 	vtx.vertex.x = 0.0f;
 	vtx.vertex.y = 0.5f;
+	vtx.t = 0.0f;
+	vtx.s = 1.0f;
 	vertices.push_back(vtx);
 
 

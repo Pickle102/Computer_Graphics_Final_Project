@@ -90,7 +90,6 @@ public:
 
 	  if (_age > _lifeTime)
 	  {
-		  std::cout << "Reinit Particle" << std::endl;
 		  InitializeParticle(_fps);
 	  }
 	  
