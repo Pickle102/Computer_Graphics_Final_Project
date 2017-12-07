@@ -534,15 +534,36 @@ SceneNode* ConstructSkyBox(UnitSquareSurface* unit_square,
 	return skybox;
 }
 
-
-SceneNode* FireParticle(PresentationNode* fire_particle_material, SceneNode* firebox)
+SceneNode* ConstructFire(TexturedUnitSquareSurface* textured_square)
 {
-	SceneNode* fire_particle_effect = new ParticleNode(FRAMES_PER_SEC);
+	SceneNode* fire = new SceneNode();
 
-	fire_particle_effect->AddChild(fire_particle_material);
-	fire_particle_material->AddChild(firebox);
+	// Fire particle transform
+	TransformNode* fire_particle_transform = new TransformNode;
+	fire_particle_transform->Translate(0.0f, 0.0f, 2.6f);
+	fire_particle_transform->Scale(0.5f, 0.5f, 0.5f);
 
-	return fire_particle_effect;
+	// Construct fire particle material
+	PresentationNode* fire_particle_material = new PresentationNode(Color4(0.8f, 0.8f, 0.0f),
+		Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(1.0f, 1.0f, 0.0f), 0.0f);
+	fire_particle_material->SetTexture("fire.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
+	// Construct graph
+	fire->AddChild(fire_particle_transform);
+	fire_particle_transform->AddChild(fire_particle_material);
+
+	// Construct a particle firebox
+	SceneNode* firebox = ConstructTexturedUnitBox(textured_square);
+
+	// Construct about 50 particles
+	for (int i = 0; i < 50; i++)
+	{
+		ParticleNode* fire_particle_effect = new ParticleNode(FRAMES_PER_SEC);
+		fire_particle_material->AddChild(fire_particle_effect);
+		fire_particle_effect->AddChild(firebox);
+	}
+
+	return fire;
 }
 
 /**
@@ -627,25 +648,12 @@ void ConstructScene() {
   // Fire transform
   TransformNode* fire_transform = new TransformNode;
 
-  // Fire particle transform
-  TransformNode* fire_particle_transform = new TransformNode;
-  fire_particle_transform->Translate(0.0f, 0.0f, 2.6f);
-  fire_particle_transform->Scale(0.5f, 0.5f, 0.5f);
-
   // Construct firewood
   TransformNode* firewood_transform = new TransformNode;
   firewood_transform->Translate(0.0f, 0.0f, 1.2f);
   firewood_transform->Scale(0.5f, 0.5f, 0.5f);
 
   SceneNode* firewood = ConstructFirewood(ConstructTexturedUnitBox(textured_generic_square));
-
-  // Construct fire particle effect
-  ParticleNode* fire_particle_effect = new ParticleNode(FRAMES_PER_SEC);
-
-  // Construct fire particle material
-  PresentationNode* fire_particle_material = new PresentationNode(Color4(0.8f, 0.8f, 0.0f),
-	  Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(1.0f, 1.0f, 0.0f), 0.0f);
-  fire_particle_material->SetTexture("fire.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
   // Construct tent
   TransformNode* tent_transform = new TransformNode;
@@ -678,16 +686,8 @@ void ConstructScene() {
   fire_transform->AddChild(firewood_transform);
   firewood_transform->AddChild(firewood);
 
-  // Firebox
-  SceneNode* firebox = ConstructTexturedUnitBox(textured_generic_square);
-
-  // Add the fire particle effect
-  fire_transform->AddChild(fire_particle_transform);
-
-  for (int i = 0; i < 50; i++)
-  {
-	  fire_particle_transform->AddChild(FireParticle(fire_particle_material, firebox));
-  }
+  // Add the fire
+  fire_transform->AddChild(ConstructFire(textured_generic_square));
 
   // Add the tent
   myscene->AddChild(tent_transform);
