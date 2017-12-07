@@ -3,7 +3,7 @@
 //	605.467 Computer Graphics and 605.767 Applied Computer Graphics
 //	Instructor:	David W. Nesbitt
 //
-//	Author:  Jennifer Olk
+//	Author:  Jennifer Olk, Joshua Griffith
 //	File:    FinalProject.cpp
 //	Purpose: OpenGL and GLUT program to draw polygon mesh objects.
 //
@@ -190,6 +190,9 @@ void AnimateView(int val) {
     TimerActive = false;
 }
 
+/*
+ * In this project, this function is required to animate particle systems by calling into update
+ */
 void AnimateParticles(int value) 
 {
 	// Update the scene graph
@@ -298,14 +301,13 @@ SceneNode* ConstructGround(TexturedUnitSquareSurface* textured_square)
 	return ground;
 }
 
-
 /**
 * Construct firewood
 * @param  box  Geometry node to use for wood
 * @return Returns a scene node representing the firewood
 */
 SceneNode* ConstructFirewood(SceneNode* box) {
-	// Table legs (relative to center of table)
+	// Firewood logs / pieces
 	TransformNode* piece1 = new TransformNode;
 	piece1->Translate(2.5f, 0.0f, 0.0f);
 	piece1->RotateY(45.0f);
@@ -341,41 +343,34 @@ SceneNode* ConstructFirewood(SceneNode* box) {
 	piece3->AddChild(box);
 	piece4->AddChild(box);
 
-
 	return firewood;
 }
 
 /**
 * Construct a unit tent with outward facing normals.
-* @param  textured_square  Geometry node to use
+* @param  textured_triangle  Geometry node to use for front/back
+* @param  textured_square  Geometry node to use for sides/bottom
 */
 SceneNode* ConstructUnitTent(TexturedUnitTriangleSurface* textured_triangle, TexturedUnitSquareSurface* textured_square) {
-	// Contruct transform nodes for the sides of the box.
-	// Perform rotations so the sides face outwards
-
-	// Bottom is rotated 180 degrees so it faces outwards
+	// Contruct transform nodes for the tent faces
 	TransformNode* bottom_transform = new TransformNode;
 	bottom_transform->Translate(0.0f, 0.0f, -0.5f);
 	bottom_transform->RotateX(180.0f);
 
-	// Back is rotated -90 degrees about x: (z -> y)
 	TransformNode* back_transform = new TransformNode;
 	back_transform->Translate(0.0f, 0.5f, 0.0f);
 	back_transform->RotateX(-90.0f);
 	back_transform->RotateZ(180.0f);
 
-	// Front wall is rotated 90 degrees about x: (y -> z)
 	TransformNode* front_transform = new TransformNode;
 	front_transform->Translate(0.0f, -0.5f, 0.0f);
 	front_transform->RotateX(90.0f);
 
-	// Left wall is rotated -90 about y: (z -> -x)
 	TransformNode* left_transform = new TransformNode;
 	left_transform->Translate(-0.25f, 0.0f, 00.0f);
 	left_transform->RotateY(-63.5f);
 	left_transform->Scale(1.1f, 1.0f, 1.0f);
 
-	// Right wall is rotated 90 degrees about y: (z -> x)
 	TransformNode* right_transform = new TransformNode;
 	right_transform->Translate(0.25f, 0.0f, 0.0f);
 	right_transform->RotateY(63.5f);
@@ -385,7 +380,7 @@ SceneNode* ConstructUnitTent(TexturedUnitTriangleSurface* textured_triangle, Tex
 		Color4(0.4f, 0.4f, 0.4f), Color4(0.2f, 0.2f, 0.2f), Color4(0.0f, 0.0f, 0.0f), 25.0f);
 	tent_material->SetTexture("tent.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
-	// Create a SceneNode and add the 6 sides of the box.
+	// Create a SceneNode and add the tent faces
 	SceneNode* tent = new SceneNode;
 	tent->AddChild(tent_material);
 	tent_material->AddChild(back_transform);
@@ -534,6 +529,11 @@ SceneNode* ConstructSkyBox(UnitSquareSurface* unit_square,
 	return skybox;
 }
 
+/**
+* ConstructFire
+* @param  textured_square  Textured geometry node to use
+* @return Returns a scene node that describes the fire
+*/
 SceneNode* ConstructFire(TexturedUnitSquareSurface* textured_square)
 {
 	SceneNode* fire = new SceneNode();
@@ -657,9 +657,9 @@ void ConstructScene() {
 
   // Construct tent
   TransformNode* tent_transform = new TransformNode;
-  tent_transform->Translate(25.0f, 25.0f, 6.5f);
+  tent_transform->Translate(25.0f, 25.0f, 5.0f);
   tent_transform->RotateZ(-45.0f);
-  tent_transform->Scale(15.0f, 15.0f, 15.0f);
+  tent_transform->Scale(15.0f, 15.0f, 10.0f);
 
   SceneNode* tent = ConstructUnitTent(textured_generic_triangle, textured_generic_square);
  

@@ -14,12 +14,13 @@
 
 /**
  * Particle node base class. Stores and draws particles.
+ * This currently is tuned to a fire particle system -- not generalized
  */
 class ParticleNode : public TransformNode {
 public:
-	float     _speed;             // Speed - units per frame
-	Point3    _position;          // Current position
-	Vector3   _direction;         // Direction vector (unit length)
+	float     _speed;         
+	Point3    _position;        
+	Vector3   _direction;       
 	float _size;
 	float _age = 0.0f;
 	float _lifeTime = 0.0f;
@@ -28,6 +29,7 @@ public:
 
   /**
    * Constructor
+   * @param fps the frames per second
    */
   ParticleNode(float fps) 
   {
@@ -35,6 +37,11 @@ public:
 	  InitializeParticle(fps);
   }
 
+  /*
+   * This reinitializes a particle to some starting value, rather 
+   * than destroying / recreating the particle
+   * @param fps the frames per second
+   */
   void InitializeParticle(float fps)
   {
 	  _age = 0.0f;
@@ -100,6 +107,7 @@ public:
 	  return minv + ((maxv - minv) * (float)rand() / (float)RAND_MAX);
   }
 
+  // Get a random number
   float getRand01() const {
 	  return (float)rand() / (float)RAND_MAX;
   }

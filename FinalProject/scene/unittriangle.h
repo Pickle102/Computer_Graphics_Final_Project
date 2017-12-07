@@ -15,10 +15,9 @@
 class UnitTriangleSurface : public TriSurface {
 public:
 	/**
-	 * Creates a unit length and width "flat surface".  The surface is composed of
-	 * triangles such that the unit length/width surface is divided into n
-	 * equal paritions in both x and y. Constructs a vertex list and face list
-	 * for the surface.
+	 * Creates a unit triangle with n subdivisions. 
+	 * Note that this is the intention -- this currently only 
+	 * supports a single triangle (3 vertices)
    * @param  n   Number of subdivisions in x and y
 	 */
 	UnitTriangleSurface(uint32_t n, const int position_loc, const int normal_loc) {
