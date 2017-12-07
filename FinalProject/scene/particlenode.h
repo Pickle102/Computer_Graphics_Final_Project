@@ -56,16 +56,17 @@ public:
 
 	  _size = getRandom(0.1f, 1.0f);
 
+	  // If the particle is large, make it slower than die sooner
 	  if (_size > 0.5f)
 	  {
 		  _speed = getRandom(5.0f, 7.0f) / fps;
 		  _lifeTime = getRandom(72.0f * 0.2, 72.0f * 0.6);
-	  }
+	  } // Otherwise, if it's reall small, make it really fast, and live a bit longer
 	  else if (_size < 0.2)
 	  {
 		  _speed = getRandom(8.0f, 10.0f) / fps;
 		  _lifeTime = getRandom(72.0f * 0.4, 72.0f * 1.0);
-	  }
+	  } // For all others, put them in the middle as far as speed, but give them a decent length life
 	  else
 	  {
 		  _speed = getRandom(6.5f, 8.0f) / fps;
