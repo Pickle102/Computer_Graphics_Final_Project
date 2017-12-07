@@ -210,20 +210,30 @@ void AnimateParticles(int value)
 */
 SceneNode* ConstructTrees(TexturedUnitSquareSurface* tree_square)
 {
-    // Construct the trees
-    const int NUM_TREES = 75;
-    const int MAX_Y = 200;
-    const int MIN_Y = -200;
-    const int MAX_X = 200;
-    const int MIN_X = -200;
-    int randomX = 0;
-    int randomY = 0;
-    SceneNode* trees = new SceneNode;
+    // Number of trees to generate
+    const int NUM_TREES = 2000;
 
+    // (x,y) location constraints for trees
+    const int MAX_Y = 2000;
+    const int MIN_Y = -2000;
+    const int MAX_X = 2000;
+    const int MIN_X = -2000;
+
+    // The radius around (0,0) to avoid putting trees
+    const int restrictedRadius = 40;
+
+    // Random tree size constraints
+    const int MIN_WIDTH = 15;
+    const int MAX_WIDTH = 30;
+    const int MIN_HEIGHT = 15;
+    const int MAX_HEIGHT = 30;
+
+    // Construct the trees
+    SceneNode* trees = new SceneNode;
 
     // Create a tree material with a picture
     PresentationNode* tree_material = new PresentationNode(
-        Color4(0.5f, 0.5f, 0.5f), Color4(0.75f, 0.75f, 0.75f),
+        Color4(0.5f, 0.5f, 0.5f), Color4(0.1f, 0.1f, 0.1f),
         Color4(0.1f, 0.1f, 0.1f), Color4(0.0f, 0.0f, 0.0f), 5.0f);
     tree_material->SetTexture("tree5.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
         GL_NEAREST, GL_NEAREST);
@@ -233,18 +243,34 @@ SceneNode* ConstructTrees(TexturedUnitSquareSurface* tree_square)
     trees->AddChild(tree_material);
 
     // Create NUM_TREES trees
+    int randomX = 0;
+    int randomY = 0;
+    int randomHeight = 0;
+    int randomWidth = 0;
     TransformNode* treeFront_transform;
     for (int treeNum = 0; treeNum < NUM_TREES; ++treeNum)
     {
-        // Create a n random x, y
+        // Create random x,y
         randomX = rand() % (MAX_X - MIN_X + 1) + MIN_X;
         randomY = rand() % (MAX_Y - MIN_Y + 1) + MIN_Y;
 
+        // Create random width,height
+        randomWidth = rand() % (MAX_WIDTH - MIN_WIDTH + 1) + MIN_WIDTH;
+        randomHeight = rand() % (MAX_HEIGHT - MIN_HEIGHT + 1) + MIN_HEIGHT;
+
+        // Make sure it's not within the radius around (0,0)
+        if ((randomX >= -restrictedRadius) && (randomX <= restrictedRadius) &&
+            (randomY >= -restrictedRadius) && (randomY <= restrictedRadius))
+        {
+            treeNum--;
+            continue;
+        }
+
         // Create a new transform (otherwise we'll translate again)
         treeFront_transform = new TransformNode();
-        treeFront_transform->Translate(randomX, randomY, 6.0f);
+        treeFront_transform->Translate(randomX, randomY, randomHeight * 0.4);
         treeFront_transform->RotateX(90.0f);
-        treeFront_transform->Scale(15.0f, 15.0f, 1.0f);
+        treeFront_transform->Scale(randomWidth, randomHeight, 1.0f);
 
         // Add this tree to the tree material
         tree_material->AddChild(treeFront_transform);
