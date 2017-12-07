@@ -208,8 +208,19 @@ void AnimateParticles(int value)
 /**
 * Construct the terrain for the scene.
 */
-SceneNode* ConstructTreeModel(float x, float y, TexturedUnitSquareSurface* tree_square)
+SceneNode* ConstructTrees(TexturedUnitSquareSurface* tree_square)
 {
+    // Construct the trees
+    const int NUM_TREES = 75;
+    const int MAX_Y = 200;
+    const int MIN_Y = -200;
+    const int MAX_X = 200;
+    const int MIN_X = -200;
+    int randomX = 0;
+    int randomY = 0;
+    SceneNode* trees = new SceneNode;
+
+
     // Create a tree material with a picture
     PresentationNode* tree_material = new PresentationNode(
         Color4(0.5f, 0.5f, 0.5f), Color4(0.75f, 0.75f, 0.75f),
@@ -218,19 +229,29 @@ SceneNode* ConstructTreeModel(float x, float y, TexturedUnitSquareSurface* tree_
         GL_NEAREST, GL_NEAREST);
     tree_material->CreateBillboard();
 
-    TransformNode* treeFront_transform = new TransformNode();
-    treeFront_transform->Translate(x, y, 6.0f);
-    treeFront_transform->RotateX(90.0f);
-    treeFront_transform->Scale(15.0f, 15.0f, 1.0f);
+    // Add the material as the parent of the trees
+    trees->AddChild(tree_material);
 
-    // Return the constructed floor
-    SceneNode* tree = new SceneNode;
+    // Create NUM_TREES trees
+    TransformNode* treeFront_transform;
+    for (int treeNum = 0; treeNum < NUM_TREES; ++treeNum)
+    {
+        // Create a n random x, y
+        randomX = rand() % (MAX_X - MIN_X + 1) + MIN_X;
+        randomY = rand() % (MAX_Y - MIN_Y + 1) + MIN_Y;
 
-    tree->AddChild(tree_material);
-    tree_material->AddChild(treeFront_transform);
-    treeFront_transform->AddChild(tree_square);
+        // Create a new transform (otherwise we'll translate again)
+        treeFront_transform = new TransformNode();
+        treeFront_transform->Translate(randomX, randomY, 6.0f);
+        treeFront_transform->RotateX(90.0f);
+        treeFront_transform->Scale(15.0f, 15.0f, 1.0f);
 
-    return tree;
+        // Add this tree to the tree material
+        tree_material->AddChild(treeFront_transform);
+        treeFront_transform->AddChild(tree_square);
+    }
+
+    return trees;
 }
 
 /**
@@ -629,21 +650,7 @@ void ConstructScene() {
   SceneNode* ground = ConstructGround(textured_square);
 
   // Construct the trees
-  const int NUM_TREES = 25;
-  const int MAX_Y = 200;
-  const int MIN_Y = -200;
-  const int MAX_X = 200;
-  const int MIN_X = -200;
-  int randomX;
-  int randomY;
-  SceneNode* trees = new SceneNode;
-  for (int treeNum = 0; treeNum < NUM_TREES; ++treeNum)
-  {
-      randomX = rand() % (MAX_X - MIN_X + 1) + MIN_X;
-      randomY = rand() % (MAX_Y - MIN_Y + 1) + MIN_Y;
-
-      trees->AddChild(ConstructTreeModel(randomX, randomY, tree_textured_square));
-  }
+  SceneNode* trees = ConstructTrees(tree_textured_square);
 
   // Fire transform
   TransformNode* fire_transform = new TransformNode;
