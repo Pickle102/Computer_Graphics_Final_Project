@@ -39,6 +39,8 @@ extern TriSurface* ConstructTetrahedron(const int position_loc, const int normal
 extern TriSurface* ConstructDodecahedron(const int position_loc, const int normal_loc);
 extern TriSurface* ConstructBuckyball(const int position_loc, const int normal_loc);
 
+const float FRAMES_PER_SEC = 60.0f;
+
 // Light types
 enum LightType { FIXED_WORLD, MOVING_LIGHT, MINERS_LIGHT };
 
@@ -188,6 +190,18 @@ void AnimateView(int val) {
     TimerActive = false;
 }
 
+void AnimateParticles(int value) 
+{
+	// Update the scene graph
+	SceneState scene_state;
+	SceneRoot->Update(scene_state);
+
+	// Set update to specified frames per second
+	glutTimerFunc((int)(1000.0f / FRAMES_PER_SEC), AnimateParticles, 0);
+
+	glutPostRedisplay();
+}
+
 /**
 * Construct the terrain for the scene.
 */
@@ -287,7 +301,7 @@ SceneNode* ConstructGround(TexturedUnitSquareSurface* textured_square)
 
 /**
 * Construct firewood
-* @param  unit_square  Geometry node to use for wood
+* @param  box  Geometry node to use for wood
 * @return Returns a scene node representing the firewood
 */
 SceneNode* ConstructFirewood(SceneNode* box) {
@@ -316,8 +330,8 @@ SceneNode* ConstructFirewood(SceneNode* box) {
 	firewood_material->SetTexture("firewood.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
 	// Create the tree
-	SceneNode* table = new SceneNode;
-	table->AddChild(firewood_material);
+	SceneNode* firewood = new SceneNode;
+	firewood->AddChild(firewood_material);
 	firewood_material->AddChild(piece1);
 	firewood_material->AddChild(piece2);
 	firewood_material->AddChild(piece3);
@@ -328,7 +342,7 @@ SceneNode* ConstructFirewood(SceneNode* box) {
 	piece4->AddChild(box);
 
 
-	return table;
+	return firewood;
 }
 
 /**
@@ -520,6 +534,17 @@ SceneNode* ConstructSkyBox(UnitSquareSurface* unit_square,
 	return skybox;
 }
 
+
+SceneNode* FireParticle(PresentationNode* fire_particle_material, SceneNode* firebox)
+{
+	SceneNode* fire_particle_effect = new ParticleNode(FRAMES_PER_SEC);
+
+	fire_particle_effect->AddChild(fire_particle_material);
+	fire_particle_material->AddChild(firebox);
+
+	return fire_particle_effect;
+}
+
 /**
  * Construct scene including camera, lights, geometry nodes
  */
@@ -599,6 +624,14 @@ void ConstructScene() {
       trees->AddChild(ConstructTreeModel(randomX, randomY, tree_textured_square));
   }
 
+  // Fire transform
+  TransformNode* fire_transform = new TransformNode;
+
+  // Fire particle transform
+  TransformNode* fire_particle_transform = new TransformNode;
+  fire_particle_transform->Translate(0.0f, 0.0f, 2.6f);
+  fire_particle_transform->Scale(0.5f, 0.5f, 0.5f);
+
   // Construct firewood
   TransformNode* firewood_transform = new TransformNode;
   firewood_transform->Translate(0.0f, 0.0f, 1.2f);
@@ -606,11 +639,19 @@ void ConstructScene() {
 
   SceneNode* firewood = ConstructFirewood(ConstructTexturedUnitBox(textured_generic_square));
 
+  // Construct fire particle effect
+  ParticleNode* fire_particle_effect = new ParticleNode(FRAMES_PER_SEC);
+
+  // Construct fire particle material
+  PresentationNode* fire_particle_material = new PresentationNode(Color4(0.8f, 0.8f, 0.0f),
+	  Color4(0.0f, 0.0f, 0.0f), Color4(0.0f, 0.0f, 0.0f), Color4(1.0f, 1.0f, 0.0f), 0.0f);
+  fire_particle_material->SetTexture("fire.jpg", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+
   // Construct tent
   TransformNode* tent_transform = new TransformNode;
   tent_transform->Translate(25.0f, 25.0f, 6.5f);
   tent_transform->RotateZ(-45.0f);
-  tent_transform->Scale(20.0f, 20.0f, 20.0f);
+  tent_transform->Scale(15.0f, 15.0f, 15.0f);
 
   SceneNode* tent = ConstructUnitTent(textured_generic_triangle, textured_generic_square);
  
@@ -630,9 +671,23 @@ void ConstructScene() {
   myscene->AddChild(ground);
   myscene->AddChild(trees);
 
+  // Add the fire transform
+  myscene->AddChild(fire_transform);
+
   // Add the firewood
-  myscene->AddChild(firewood_transform);
+  fire_transform->AddChild(firewood_transform);
   firewood_transform->AddChild(firewood);
+
+  // Firebox
+  SceneNode* firebox = ConstructTexturedUnitBox(textured_generic_square);
+
+  // Add the fire particle effect
+  fire_transform->AddChild(fire_particle_transform);
+
+  for (int i = 0; i < 50; i++)
+  {
+	  fire_particle_transform->AddChild(FireParticle(fire_particle_material, firebox));
+  }
 
   // Add the tent
   myscene->AddChild(tent_transform);
@@ -866,6 +921,9 @@ int main(int argc, char** argv) {
 
   // Construct the scene.
   ConstructScene();
+
+  // Set update rate and set initial timer callback
+  glutTimerFunc((int)(1000.0f / FRAMES_PER_SEC), AnimateParticles, 0);
 
   glutMainLoop();
   return 0;

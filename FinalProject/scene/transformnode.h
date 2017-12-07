@@ -124,13 +124,6 @@ public:
     scene_state.PopTransforms();
 	}
 
-  /**
-	 * Update the scene node and its children
-   * @param  sceneState   Current scene state
-	 */
-	virtual void Update(SceneState& sceneState) {
-  }
-
 protected:
   Matrix4x4 model_matrix;   // Local modeling transformation
 };
