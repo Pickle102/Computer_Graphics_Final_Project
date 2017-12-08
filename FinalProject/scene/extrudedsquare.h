@@ -48,7 +48,6 @@ public:
 	int currentIndex = 0;
 	int lastFaceIndex = currentIndex;
 	CreateSquareFaceList(currentIndex);
-
 	for (int i = 0; i < path.size(); i++)
 	{
 		int faceIndex = 0;
@@ -145,6 +144,16 @@ public:
 				vtx.vertex.z = vertices[faceIndex + 2].vertex.z;
 				vertices.push_back(vtx);
 			}
+
+            size_t index = vertices.size();
+            Vector3 edge1(vertices[index-1].vertex, vertices[index-2].vertex);
+            Vector3 edge2(vertices[index-3].vertex, vertices[index-4].vertex);
+            Vector3 normal = (edge1.Cross(edge2)).Normalize();
+
+            vertices[index - 1].normal = normal;
+            vertices[index - 2].normal = normal;
+            vertices[index - 3].normal = normal;
+            vertices[index - 4].normal = normal;
 
 			currentIndex += 4;
 			CreateSquareFaceList(currentIndex);

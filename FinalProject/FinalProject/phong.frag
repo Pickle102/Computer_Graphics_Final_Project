@@ -227,11 +227,8 @@ void main()
 		float fogStart = 50;
 		float fogEnd = 80;
 
-		//range based
+		//range based distance
 		distance = length(viewSpace);
-
-		//plane based
-		//distance = abs(viewSpace.z);
 
 		// linear fog
 		fogFactor = (fogEnd - distance)/(fogEnd - fogStart);
