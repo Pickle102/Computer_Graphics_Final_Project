@@ -53,5 +53,6 @@ inline std::vector<Point3> FormTriangle(const Point3& v0, const Point3& v1,
 #include "scene/modelnode.h"
 #include "scene/unittriangle.h"
 #include "scene/particlenode.h"
+#include "scene/extrudedsquare.h"
 
 #endif
