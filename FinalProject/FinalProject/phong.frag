@@ -235,9 +235,9 @@ void main()
 
 		// linear fog
 		fogFactor = (fogEnd - distance)/(fogEnd - fogStart);
-		fogFactor = clamp( fogFactor, 0.0, 1.0 );
+		fogFactor = clamp( fogFactor, 0.2, 1.0 );
 
-		color = mix(fogColor, color, fogFactor + 0.2);
+		color = mix(fogColor, color, fogFactor);
 	}
 
 	fragColor = clamp(color, 0.0, 1.0);

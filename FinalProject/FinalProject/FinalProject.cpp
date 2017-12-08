@@ -276,17 +276,9 @@ SceneNode* ConstructTrees(TexturedUnitSquareSurface* tree_square)
         treeFront_transform->RotateX(90.0f);
         treeFront_transform->Scale(randomWidth, randomHeight, 1.0f);
 
-        //treeBack_transform = new TransformNode();
-        //treeBack_transform->Translate(randomX, randomY, randomHeight * 0.4);
-        //treeBack_transform->RotateX(90.0f);
-        //treeBack_transform->RotateY(180.0f);
-        //treeBack_transform->Scale(randomWidth, randomHeight, 1.0f);
-
         // Add this tree to the tree material
         tree_material->AddChild(treeFront_transform);
         treeFront_transform->AddChild(tree_square);
-        //tree_material->AddChild(treeBack_transform);
-        //treeBack_transform->AddChild(tree_square);
     }
 
     return trees;
