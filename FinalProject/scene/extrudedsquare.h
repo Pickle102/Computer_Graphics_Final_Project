@@ -28,9 +28,16 @@ public:
 		std::vector< std::tuple<Vector3, float> > path;
 		
 		// Construct a path to extrude about. Essentially a list of sequential vectors with lengths.
-		path.push_back( std::tuple<Vector3, float>(Vector3(0.0, 0.0, 1.0), 1.0f) );
-		path.push_back(std::tuple<Vector3, float>(Vector3(0.0, 1.0, 1.0), 2.0f));
-		path.push_back(std::tuple<Vector3, float>(Vector3(0.0, 1.0, 0.5), 3.0f));
+		path.push_back(std::tuple<Vector3, float>(Vector3(0.0, 2.5, 1.0), 2.5f));
+		path.push_back( std::tuple<Vector3, float>(Vector3(0.0, 5.0, 1.0), 5.0f) );
+		path.push_back(std::tuple<Vector3, float>(Vector3(0.0, 5.0, 1.0), 5.0f));
+		path.push_back(std::tuple<Vector3, float>(Vector3(0.0, 2.5, 1.0), 7.5f));
+		path.push_back(std::tuple<Vector3, float>(Vector3(0.0, 0.0, 1.0), 10.0f));
+		path.push_back(std::tuple<Vector3, float>(Vector3(0.0, 0.0, 1.0), 7.0f));
+		path.push_back(std::tuple<Vector3, float>(Vector3(0.0, -7.0, 1.0), 7.0f));
+		path.push_back(std::tuple<Vector3, float>(Vector3(0.0, -7.0, 1.0), 3.0f));
+		path.push_back(std::tuple<Vector3, float>(Vector3(0.0, 0.0, 1.0), 3.0f));
+		path.push_back(std::tuple<Vector3, float>(Vector3(0.0, 0.0, 1.0), 0.0f));
 
 		
     // Normal is 0,0,1. z = 0 so all vertices lie in x,y plane.
@@ -61,20 +68,20 @@ public:
 		vtx.normal = std::get<0>(path[i]);
 		vtx.vertex.z = length;
 
-		vtx.vertex.x = -0.5f;
-		vtx.vertex.y = -0.5f;
+		vtx.vertex.x = -0.5f + direction.x;
+		vtx.vertex.y = -0.5f + direction.y;
 		vertices.push_back(vtx);
 
-		vtx.vertex.x = 0.5f;
-		vtx.vertex.y = -0.5f;
+		vtx.vertex.x = 0.5f + direction.x;
+		vtx.vertex.y = -0.5f + direction.y;
 		vertices.push_back(vtx);
 
-		vtx.vertex.x = -0.5f;
-		vtx.vertex.y = 0.5f;
+		vtx.vertex.x = -0.5f + direction.x;
+		vtx.vertex.y = 0.5f + direction.y;
 		vertices.push_back(vtx);
 
-		vtx.vertex.x = 0.5f;
-		vtx.vertex.y = 0.5f;
+		vtx.vertex.x = 0.5f + direction.x;
+		vtx.vertex.y = 0.5f + direction.y;
 		vertices.push_back(vtx);
 
 		currentIndex += 4;
@@ -147,7 +154,15 @@ public:
 			}
 
 			currentIndex += 4;
-			CreateSquareFaceList(currentIndex);
+
+			if (j < 2)
+			{
+				CreateSquareFaceListAlt(currentIndex);
+			}
+			else
+			{
+				CreateSquareFaceList(currentIndex);
+			}
 		}
 
 		lastFaceIndex = faceIndex;
@@ -171,6 +186,17 @@ private:
 		faces.push_back(startIndex + 1);
 		faces.push_back(startIndex + 3);
 		faces.push_back(startIndex + 2);
+	}
+
+	void CreateSquareFaceListAlt(int startIndex)
+	{
+		faces.push_back(startIndex);
+		faces.push_back(startIndex + 2);
+		faces.push_back(startIndex + 1);
+
+		faces.push_back(startIndex + 1);
+		faces.push_back(startIndex + 2);
+		faces.push_back(startIndex + 3);
 	}
 };
 
