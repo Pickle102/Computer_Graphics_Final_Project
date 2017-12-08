@@ -748,7 +748,7 @@ void ConstructScene() {
   extruded_transform->Scale(0.6f, 0.6f, 0.6f);
 
   PresentationNode* extruded_material = new PresentationNode(
-	  Color4(0.3f, 0.2f, 0.0f), Color4(0.3f, 0.2f, 0.0f),
+	  Color4(1.0f, 1.0f, 0.0f), Color4(0.3f, 0.2f, 0.0f),
 	  Color4(0.1f, 0.1f, 0.1f), Color4(0.0f, 0.0f, 0.0f), 55.0f);
 
   ExtrudedSquare* extrudedSquare = new ExtrudedSquare(position_loc, normal_loc);
