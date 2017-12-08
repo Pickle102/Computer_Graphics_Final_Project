@@ -742,13 +742,13 @@ void ConstructScene() {
 
   // Construct and add an extruded geometry node
   TransformNode* extruded_transform = new TransformNode();
-  extruded_transform->Translate(-3.0f, 0.0f, 7.0f);
-  extruded_transform->RotateZ(45.0f);
-  extruded_transform->RotateX(90.0f);
-  extruded_transform->Scale(10.0f, 10.0f, 10.0f);
+  extruded_transform->Translate(3.0f, 0.0f, 15.0f);
+  extruded_transform->RotateZ(90.0f);
+  extruded_transform->RotateX(270.0f);
+  extruded_transform->Scale(0.6f, 0.6f, 0.6f);
 
   PresentationNode* extruded_material = new PresentationNode(
-	  Color4(0.5f, 0.5f, 0.5f), Color4(0.3f, 0.3f, 0.3f),
+	  Color4(0.3f, 0.2f, 0.0f), Color4(0.3f, 0.2f, 0.0f),
 	  Color4(0.1f, 0.1f, 0.1f), Color4(0.0f, 0.0f, 0.0f), 55.0f);
 
   ExtrudedSquare* extrudedSquare = new ExtrudedSquare(position_loc, normal_loc);
