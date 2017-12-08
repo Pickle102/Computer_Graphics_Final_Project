@@ -191,6 +191,14 @@ public:
   }
 
   /**
+  * Disable fog 
+  */
+  void DisableFog()
+  {
+	  glUniform1i(usefog_loc, 0);
+  }
+
+  /**
   * Get the location of the vertex position attribute.
   * @return  Returns the vertex position attribute location.
   */

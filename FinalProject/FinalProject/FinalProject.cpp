@@ -41,6 +41,9 @@ extern TriSurface* ConstructBuckyball(const int position_loc, const int normal_l
 
 const float FRAMES_PER_SEC = 60.0f;
 
+LightingShaderNode* lightingShader;
+Color4 fogColor = Color4(0.25f, 0.25f, 0.25f, 1.0f);
+
 // Light types
 enum LightType { FIXED_WORLD, MOVING_LIGHT, MINERS_LIGHT };
 
@@ -233,8 +236,8 @@ SceneNode* ConstructTrees(TexturedUnitSquareSurface* tree_square)
 
     // Create a tree material with a picture
     PresentationNode* tree_material = new PresentationNode(
-        Color4(0.5f, 0.5f, 0.5f), Color4(0.1f, 0.1f, 0.1f),
-        Color4(0.1f, 0.1f, 0.1f), Color4(0.0f, 0.0f, 0.0f), 5.0f);
+        Color4(0.5f, 0.5f, 0.5f), Color4(0.03f, 0.03f, 0.03f),
+        Color4(0.1f, 0.1f, 0.1f), Color4(0.0f, 0.0f, 0.0f), 55.0f);
     tree_material->SetTexture("tree5.png", GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE,
         GL_NEAREST, GL_NEAREST);
     tree_material->CreateBillboard();
@@ -298,7 +301,7 @@ void ConstructLighting(LightingShaderNode* lighting) {
 	Color4 globalAmbient(0.4f, 0.4f, 0.4f, 1.0f);
 	lighting->SetGlobalAmbient(globalAmbient);
 
-	lighting->EnableFog(Color4(0.25f, 0.25f, 0.25f, 1.0f));
+	lighting->EnableFog(fogColor);
 
 	// Light 0 - point light source for fire
 	LightNode* light0 = new LightNode(0);
@@ -633,7 +636,7 @@ SceneNode* ConstructFire(TexturedUnitSquareSurface* textured_square)
 void ConstructScene() {
 
   // Construct the lighting shader node
-  LightingShaderNode* lightingShader = new LightingShaderNode();
+  lightingShader = new LightingShaderNode();
   if (!lightingShader->Create("phong.vert", "phong.frag") ||
 	  !lightingShader->GetLocations())
   {
@@ -646,7 +649,7 @@ void ConstructScene() {
 
     // Initialize the view and set a perspective projection
     MyCamera = new CameraNode;
-    MyCamera->SetPosition(Point3(0.0f, -100.0f, startingCameraHeight));
+    MyCamera->SetPosition(Point3(0.0f, -90.0f, startingCameraHeight));
     MyCamera->SetLookAtPt(Point3(0.0f, 0.0f, startingCameraHeight));
     MyCamera->SetViewUp(Vector3(0.0, 0.0, 1.0));
 
@@ -841,6 +844,14 @@ void keyboard(unsigned char key, int x, int y) {
         MyCamera->SetViewUp(Vector3(0.0, 0.0, 1.0));
         UpdateSpotlight();
         break;
+
+	case '1':
+		lightingShader->DisableFog();
+		break;
+
+	case '2':
+		lightingShader->EnableFog(fogColor);
+		break;
 
     default:
         break;
