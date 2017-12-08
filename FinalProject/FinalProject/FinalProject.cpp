@@ -747,6 +747,24 @@ void ConstructScene() {
   // Add the tent
   myscene->AddChild(tent_transform);
   tent_transform->AddChild(tent);
+
+  // Construct and add an extruded geometry node
+  TransformNode* extruded_transform = new TransformNode();
+  extruded_transform->Translate(-3.0f, 0.0f, 7.0f);
+  extruded_transform->RotateZ(45.0f);
+  extruded_transform->RotateX(90.0f);
+  extruded_transform->Scale(10.0f, 10.0f, 10.0f);
+
+  PresentationNode* extruded_material = new PresentationNode(
+	  Color4(0.5f, 0.5f, 0.5f), Color4(0.3f, 0.3f, 0.3f),
+	  Color4(0.1f, 0.1f, 0.1f), Color4(0.0f, 0.0f, 0.0f), 55.0f);
+
+  ExtrudedSquare* extrudedSquare = new ExtrudedSquare(position_loc, normal_loc);
+
+  myscene->AddChild(extruded_transform);
+  extruded_transform->AddChild(extruded_material);
+  extruded_material->AddChild(extrudedSquare);
+
 }
 
 /**
